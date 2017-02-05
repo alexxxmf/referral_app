@@ -16,6 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+from subscribers.views import HomeView
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    #subscribers app
+    url(r'^$', HomeView.as_view(), name='home'),
 ]
