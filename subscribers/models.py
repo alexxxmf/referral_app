@@ -23,7 +23,7 @@ class Subscriber(models.Model):
 		self.email_from_referrer = email_from_referrer
 		self.referral_count = 0
 		self.unique_code = uuid.uuid4().hex
-		
+
 		super().save(*args, **kwargs)
 
 	def __repr__(self):

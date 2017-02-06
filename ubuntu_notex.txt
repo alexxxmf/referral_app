@@ -1,0 +1,31 @@
+prior to install libraries from requirements.txt run this to avoid
+some issues related with postgresql libray psycopg
+sudo apt-get install libpq-dev python-dev
+http://web.archive.org/web/20140615091953/http://goshawknest.wordpress.com/2011/02/16/how-to-install-psycopg2-under-virtualenv/
+
+#just in case there is no pip for python3
+sudo apt-get install python3-pip
+
+#remember to be root user to use django
+sudo su
+
+assuming virtualenvwrapper is the tool you use to manage virtualenvs
+
+#install if not present virtualenvwrapper
+
+#first create and activate venv
+mkvirtualenv referral_app_v2
+workon referral_app_v2
+
+#install postgresql in case you don;t have it
+sudo apt-get install postgresql postgresql-contrib
+psql CREATE DATABASE db_referral_app;
+
+#create folder for the app from the remote repo
+#don't forget to switch branch
+git clone https://github.com/alexxxmf/referral_app_v2
+git checkout base_app
+
+#then install required stuff
+sudo apt-get install libpq-dev python-dev
+sudo pip install -requirements.txt

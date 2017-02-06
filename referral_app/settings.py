@@ -25,7 +25,9 @@ SECRET_KEY = '+n!gk)26&nb3%1deg8ql_2_hm2(mj(z%^ays3$yvm#o!xohk4u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# We have to allow testserver in case we want to test some stuff using
+# client from django shell
+ALLOWED_HOSTS = ['testserver']
 
 
 # Application definition
@@ -52,10 +54,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'referral_app.urls'
 
+TEMPLATES_PATH = BASE_DIR + '/templates'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_PATH],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,8 +83,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'db_referral_app',
-        'USER': '',
-        'PASSWORD': '',
+        'USER': 'postgres',
+        'PASSWORD': 'bitcomet',
         'HOST': 'localhost',
         'PORT': '',
     }
