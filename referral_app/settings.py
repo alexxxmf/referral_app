@@ -27,7 +27,7 @@ DEBUG = True
 
 # We have to allow testserver in case we want to test some stuff using
 # client from django shell
-ALLOWED_HOSTS = ['testserver']
+ALLOWED_HOSTS = ['testserver', '127.0.0.1']
 
 
 # Application definition

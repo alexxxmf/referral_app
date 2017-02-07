@@ -3,25 +3,22 @@ import uuid
 
 from django.db import models
 
-# Create your models here.
-
+#request.META.get('REMOTE_ADDR')
+#TODO: use request.META to get ip from user. This is a dic so
+#the important value would be this REMOTE_ADDR. The current method is going
+#to give us the same ip all day long (server)
 class Subscriber(models.Model):
 	db_table = 'subscribers'
 
-	confirmed_subscription = models.BooleanField()
+	confirmed_subscription = models.BooleanField(default=False)
 	email = models.EmailField(unique=True)
 	email_from_referrer = models.EmailField(null=True, blank=True)
 	ip = models.CharField(max_length=30)
-	referral_count = models.IntegerField()
-	referred = models.BooleanField()
+	referral_count = models.IntegerField(default=0)
+	referred = models.BooleanField(default=False)
 	unique_code = models.CharField(max_length=120, unique=True)
 
-	def save(self, referred=False, email_from_referrer=None,unique_code_provided=None, *args, **kwargs):
-		self.confirmed_subscription = False
-		self.ip = gethostbyname(gethostname())
-		self.referred = referred
-		self.email_from_referrer = email_from_referrer
-		self.referral_count = 0
+	def save(self, *args, **kwargs):
 		self.unique_code = uuid.uuid4().hex
 
 		super().save(*args, **kwargs)

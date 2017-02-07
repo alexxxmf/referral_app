@@ -1,10 +1,9 @@
-from socket import gethostname, gethostbyname
 from bs4 import BeautifulSoup
 
 from django.core.urlresolvers import reverse
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
-from django.test import TestCase, Client
+from django.test import Client, RequestFactory, TestCase
 
 from subscribers.forms import SubscriptionForm
 from subscribers.models import Subscriber
@@ -21,12 +20,30 @@ class TestSubscribersTemplates(TestCase):
     def test_home_view_form_rendered_properly(self):
         response = self.client.get(reverse('home'), follow=True)
         soup = BeautifulSoup(response.content, 'html.parser')
-        form_html = soup.find(class_='form-inline')
-        self.assertNotEqual(form_html, None)
-        #check action value to see if posted content is being sent to the right url
-        action_html_attribute = form_html.find(attrs={"action" : reverse('home')})
-        self.fail(action_html_attribute)
-        #check that method attribute is set to post
+
+        form_html_attr = soup.find(
+            'form',
+            attrs={
+                "action": reverse('home'),
+                "method": 'post',
+                "role": 'form',
+            })
+        self.assertNotEqual(form_html_attr, None)
+        email_input_attr = soup.find(
+            'input',
+            attrs={
+                "maxlength": '100',
+                "name": 'email',
+                "type": 'email',
+            })
+        self.assertNotEqual(email_input_attr, None)
+        submit_btn_attr = soup.find(
+            'input',
+            attrs={
+                "type": 'submit',
+                "value": 'Submit',
+            })
+        self.assertNotEqual(submit_btn_attr, None)
 
 #Forms tests
 class TestSubscribersForms(TestCase):
@@ -53,33 +70,49 @@ class TestSubscribersViews(TestCase):
         self.assertTemplateUsed(response, 'subscribers/home.html')
         self.assertTemplateUsed(response, 'base.html')
 
-    def test_home_view_context(self):
+    def test_home_view_context_with_get_request(self):
         response = self.client.get(reverse('home'), follow=True)
-        #check that 'form' exists in context
         self.assertTrue('form' in response.context)
 
+    def test_home_view_context_with_post_request(self):
+        response = self.client.post(reverse('home'), follow=True)
+        self.assertTrue('form' in response.context)
+
+    def test_form_in_post_request_properly_gets_posted_values(self):
+        request_factory = RequestFactory()
+        post_data = {
+            "email": "alex@hotmail.com",
+        }
+        request = request_factory.post(reverse('home'), form=post_data)
+        #home = HomeView()
+        #home(request)
 
 #Models tests
 class TestSubscribersModels(TestCase):
     def test_some_subscriber_fields(self):
         subscriber = Subscriber.objects.create(email='alex@test.com')
-        current_ip = gethostbyname(gethostname())
-
         self.assertEqual(subscriber.email, 'alex@test.com')
         self.assertEqual(str(subscriber), subscriber.email)
-        self.assertEqual(subscriber.ip, current_ip)
-        self.assertNotEqual(len(subscriber.unique_code), 0)
 
     def test_subscriber_default_fields_when_not_referred(self):
         subscriber = Subscriber.objects.create(email='alex@test.com')
         self.assertEqual(subscriber.confirmed_subscription, False)
         self.assertEqual(subscriber.referred, False)
         self.assertEqual(subscriber.referral_count, 0)
+        self.assertNotEqual(len(subscriber.unique_code), 0)
 
     def test_subscriber_model_in_db(self):
-        subscriber_created = Subscriber.objects.create(email='alex@test.com')
+        subscriber_created = Subscriber.objects.create(
+            email='alex@test.com',
+            ip='127.0.0.0',
+            referred=True,
+            email_from_referrer='pepe@hotmail.com',
+        )
         subscriber_pulled = Subscriber.objects.filter(email='alex@test.com').first()
         self.assertEqual(subscriber_created.email, subscriber_pulled.email)
+        self.assertEqual(subscriber_pulled.ip, '127.0.0.0')
+        self.assertEqual(subscriber_pulled.referred, True)
+        self.assertEqual(subscriber_pulled.email_from_referrer, 'pepe@hotmail.com')
 
     def test_subscriber_email_unique(self):
         subscriber_created_1 = Subscriber.objects.create(email='alex@test.com')

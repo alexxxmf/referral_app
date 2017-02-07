@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #subscribers app
     url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^(?P<ref_code>\S+)$', HomeView.as_view(), name='home'),
 ]
