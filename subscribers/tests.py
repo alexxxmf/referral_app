@@ -9,6 +9,18 @@ from subscribers.forms import SubscriptionForm
 from subscribers.models import Subscriber
 from subscribers.views import HomeView
 
+#Integration tests
+class TestHomeBehavior(TestCase):
+
+    def test_session_created_just_when_ref_code_provided(self):
+        response = self.client.get(reverse('home'))
+        self.assertFalse(response.cookies.get('sessionid', False))
+        response = self.client.get(reverse('home') + '?ref_code=1as34e')
+        self.assertTrue(response.cookies.get('sessionid', False))
+
+    def test_subscriber_referred_with_right_ref_code(self):
+        subscriber_1 = Subscriber.objects.create(email='alex@hotmail.com')
+        #subscriber.unique_code
 
 #Templates tests
 class TestSubscribersTemplates(TestCase):
@@ -77,15 +89,6 @@ class TestSubscribersViews(TestCase):
     def test_home_view_context_with_post_request(self):
         response = self.client.post(reverse('home'), follow=True)
         self.assertTrue('form' in response.context)
-
-    def test_form_in_post_request_properly_gets_posted_values(self):
-        request_factory = RequestFactory()
-        post_data = {
-            "email": "alex@hotmail.com",
-        }
-        request = request_factory.post(reverse('home'), form=post_data)
-        #home = HomeView()
-        #home(request)
 
 #Models tests
 class TestSubscribersModels(TestCase):

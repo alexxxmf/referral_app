@@ -18,9 +18,10 @@
 
 
   <div class='input-group'>
-    
+
     {% csrf_token %}
     {{ form }}
+    {{ ref_code }}
     <input type="submit" value="Submit" />
 
   </div>
