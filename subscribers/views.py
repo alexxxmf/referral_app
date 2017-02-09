@@ -29,7 +29,7 @@ class HomeView(TemplateView):
 		if form.is_valid():
 			email = form.cleaned_data['email']
 			ip_from_user = request.META.get('REMOTE_ADDR', '0')
-			print(request.session['ref_code'])
+
 			if request.session['ref_code']:
 				email_from_referrer = Subscriber.objects.filter(unique_code=ref_code).first()
 				if email_from_referrer:

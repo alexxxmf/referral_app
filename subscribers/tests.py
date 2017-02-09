@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
+from unittest.mock import Mock, patch
 
+from django.contrib.sessions.models import Session
 from django.core.urlresolvers import reverse
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
@@ -20,7 +22,19 @@ class TestHomeBehavior(TestCase):
 
     def test_subscriber_referred_with_right_ref_code(self):
         subscriber_1 = Subscriber.objects.create(email='alex@hotmail.com')
-        #subscriber.unique_code
+        response = self.client.get(
+            reverse('home') +
+            '?ref_code=' +
+            subscriber_1.unique_code
+        )
+        sessionid_obj = response.cookies.get('sessionid', False)
+        session_key = sessionid_obj.value
+        session = Session.objects.get(session_key=session_key)
+        uid = session.get_decoded().get('ref_code')
+        self.assertEqual(uid, subscriber_1.unique_code)
+
+    
+
 
 #Templates tests
 class TestSubscribersTemplates(TestCase):
@@ -71,10 +85,17 @@ class TestSubscribersForms(TestCase):
 #Views tests
 class TestSubscribersViews(TestCase):
 
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.home_view = HomeView()
+
     def test_home_view_200_response(self):
-        response = self.client.get(reverse('home'), follow=True)
+        get_request = self.factory.get(reverse('home'))
+        response = self.home_view.get(get_request)
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(reverse('home'), follow=True)
+
+        post_request = self.factory.post(reverse('home'))
+        response = self.home_view.post(post_request)
         self.assertEqual(response.status_code, 200)
 
     def test_home_view_loads_right_template(self):
