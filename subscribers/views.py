@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect, reverse
 from django.views.generic import TemplateView
 
 from subscribers.forms import SubscriptionForm
@@ -22,7 +22,7 @@ class HomeView(TemplateView):
 			'subscribers/home.html',
 			context
 		)
-	#Check if it is compulsory tos et a default for ref_code as in Flask
+	#Check if it is compulsory to set a default for ref_code as in Flask
 	def post(self, request, ref_code=None):
 		form = SubscriptionForm(request.POST)
 		#if valid ref code means it's referred by someone
@@ -36,6 +36,7 @@ class HomeView(TemplateView):
 					referred = True
 				else:
 					referred = False
+
 			subscriber, created = Subscriber.objects.get_or_create(
 			    email=email,
 			    defaults={
@@ -46,9 +47,15 @@ class HomeView(TemplateView):
 			)
 			#better to force confirmation to update referral count from referrer
 			#referrer = Subscriber.objects.filter(email=email_from_referrer).update(referral_count=F('referral_count') + 1)
-
+			subscriber = Subscriber.objects.filter(email=email).first()
+			#should I add here a context depending if the user is created or not
+			#but w/o confirmation
 			if created:
 				return redirect(reverse('confirmation_prompt'))
+
+			elif subscriber.confirmed_subscription == False:
+				return redirect(reverse('confirmation_prompt'))
+
 			else:
 				return redirect(reverse('login'))
 

@@ -33,7 +33,28 @@ class TestHomeBehavior(TestCase):
         uid = session.get_decoded().get('ref_code')
         self.assertEqual(uid, subscriber_1.unique_code)
 
-    
+    def test_subscriber_created_and_redirected_when_right_ref_code(self):
+        #we have to check user is properly created and it's been properly redirected
+
+        subscriber_1 = Subscriber.objects.create(email='abel@hot.com')
+        #we have to create a session for the ref_code
+        response_get = self.client.get(
+            reverse('home') +
+            '?ref_code=' +
+            subscriber_1.unique_code,
+        )
+
+        response_post = self.client.post(
+            reverse('home') +
+            '?ref_code=' +
+            subscriber_1.unique_code,
+            {'email':'a@hot.com'},
+            HTTP_REMOTE_ADDR='127.0.0.1'
+        )
+
+        subscriber_2 = Subscriber.objects.filter(email='a@hot.com').first()
+        self.assertNotEqual(subscriber_2, None)
+
 
 
 #Templates tests
