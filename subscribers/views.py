@@ -78,10 +78,10 @@ class LoginView(TemplateView):
 
 	def get(self, request):
 		context = {}
-		
+
 		return render(
 			request,
-			'subscribers/confirmation.html',
+			'subscribers/login.html',
 			context
 		)
 
