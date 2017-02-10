@@ -21,7 +21,11 @@ from subscribers.views import ConfirmationView, HomeView, LoginView
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #subscribers app
+    url(r'^login/$', LoginView.as_view(), name='login'),
+    url(r'^confirmation/$', ConfirmationView.as_view(), name='confirmation_prompt'),
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^(?P<ref_code>\S+)$', HomeView.as_view(), name='home_when_referred'),
-    url(r'^confirmation/$', ConfirmationView.as_view(), name='confirmation_prompt'),
 ]
+
+
+#why if i change the order of this list all gets messy in tests???

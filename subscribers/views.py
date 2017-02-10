@@ -1,6 +1,6 @@
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
+from django.urls import reverse
 from django.views.generic import TemplateView
 
 
@@ -32,7 +32,7 @@ class HomeView(TemplateView):
 			email = form.cleaned_data['email']
 			ip_from_user = request.META.get('REMOTE_ADDR', '0')
 
-			if request.session['ref_code']:
+			if request.session.get('ref_code', False):
 				email_from_referrer = Subscriber.objects.filter(unique_code=request.session['ref_code']).first()
 				if email_from_referrer:
 					referred = True
@@ -74,17 +74,31 @@ class HomeView(TemplateView):
 		)
 
 class LoginView(TemplateView):
+	template_name = 'login.html'
 
-	def get(self):
-		pass
+	def get(self, request):
+		context = {}
+		
+		return render(
+			request,
+			'subscribers/confirmation.html',
+			context
+		)
 
-	def post(self):
+	def post(self, request):
 		pass
 
 class ConfirmationView(TemplateView):
+	template_name = 'confirmation.html'
 
-	def get(self):
-		pass
+	def get(self, request):
+		context = {}
+
+		return render(
+			request,
+			'subscribers/confirmation.html',
+			context
+		)
 
 
 class MailChimpListenerView(TemplateView):

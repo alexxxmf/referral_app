@@ -2,14 +2,14 @@ from bs4 import BeautifulSoup
 from unittest.mock import Mock, patch
 
 from django.contrib.sessions.models import Session
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.test import Client, RequestFactory, TestCase
+from django.urls import reverse
 
 from subscribers.forms import SubscriptionForm
 from subscribers.models import Subscriber
-from subscribers.views import HomeView
+from subscribers.views import HomeView, LoginView, ConfirmationView
 
 #Integration tests
 class TestHomeBehavior(TestCase):
@@ -60,14 +60,13 @@ class TestHomeBehavior(TestCase):
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
-
-
         subscriber_2 = Subscriber.objects.filter(email='a@hot.com').first()
         self.assertNotEqual(subscriber_2, None)
         self.assertTrue(subscriber_2.referred, True)
         self.assertEqual(subscriber_2.email_from_referrer, 'abel@hot.com')
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
-
+    #in tests not working but working properly when running server
+    #wtf is happening??!!!
     def test_subscriber_already_in_db_without_confirmation(self):
         subscriber = Subscriber.objects.create(email='a@hot.com')
 
@@ -76,7 +75,6 @@ class TestHomeBehavior(TestCase):
             {'email':'b@hot.com'},
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
-        response_post.session
 
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
 
@@ -87,7 +85,7 @@ class TestHomeBehavior(TestCase):
 
         response_post = self.client.post(
             reverse('home'),
-            {'email':'a@hot.com'},
+            {'email':'b@hot.com'},
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
@@ -141,7 +139,7 @@ class TestSubscribersForms(TestCase):
         self.assertEqual(form.is_valid(), True)
 
 #Views tests
-class TestSubscribersViews(TestCase):
+class TestHomeView(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -168,6 +166,38 @@ class TestSubscribersViews(TestCase):
     def test_home_view_context_with_post_request(self):
         response = self.client.post(reverse('home'), follow=True)
         self.assertTrue('form' in response.context)
+
+class TestLoginView(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.login_view = LoginView()
+
+    def test_home_view_200_response(self):
+        get_request = self.factory.get(reverse('login'))
+        response = self.login_view.get(get_request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_view_loads_right_template(self):
+        response = self.client.get(reverse('login'), follow=True)
+        self.assertTemplateUsed(response, 'subscribers/login.html')
+        self.assertTemplateUsed(response, 'base.html')
+
+class TestConfirmationView(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.confirmation_view = ConfirmationView()
+
+    def test_confirmation_view_200_response(self):
+        get_request = self.factory.get(reverse('confirmation_prompt'))
+        response = self.confirmation_view.get(get_request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_confirmation_view_loads_right_template(self):
+        response = self.client.get(reverse('confirmation_prompt'), follow=True)
+        self.assertTemplateUsed(response, 'subscribers/confirmation.html')
+        self.assertTemplateUsed(response, 'base.html')
+
+
 
 #Models tests
 class TestSubscribersModels(TestCase):
