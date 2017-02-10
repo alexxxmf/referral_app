@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 
 
-from subscribers.forms import SubscriptionForm
+from subscribers.forms import LoginForm, SubscriptionForm
 from subscribers.models import Subscriber
 
 class HomeView(TemplateView):
@@ -77,7 +77,11 @@ class LoginView(TemplateView):
 	template_name = 'login.html'
 
 	def get(self, request):
-		context = {}
+		form = LoginForm()
+
+		context = {
+			'form': form,
+		}
 
 		return render(
 			request,

@@ -93,13 +93,13 @@ class TestHomeBehavior(TestCase):
 
 
 #Templates tests
-class TestSubscribersTemplates(TestCase):
+class TestHomeTemplate(TestCase):
 
-    def test_home_view_title(self):
+    def test_home_template_title(self):
         response = self.client.get(reverse('home'), follow=True)
         self.assertNotEqual(response.content.find(b'<title>Home</title>'), -1)
 
-    def test_home_view_form_rendered_properly(self):
+    def test_home_template_form_rendered_properly(self):
         response = self.client.get(reverse('home'), follow=True)
         soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -127,14 +127,66 @@ class TestSubscribersTemplates(TestCase):
             })
         self.assertNotEqual(submit_btn_attr, None)
 
+class TestLoginTemplate(TestCase):
+
+    def test_login_template_title(self):
+        response = self.client.get(reverse('login'), follow=True)
+        self.assertNotEqual(response.content.find(b'<title>Login</title>'), -1)
+
+    def test_login_template_form_rendered_properly(self):
+        response = self.client.get(reverse('login'), follow=True)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        form_html_attr = soup.find(
+            'form',
+            attrs={
+                "action": reverse('login'),
+                "method": 'post',
+                "role": 'form',
+            })
+        self.assertNotEqual(form_html_attr, None)
+        email_input_attr = soup.find(
+            'input',
+            attrs={
+                "maxlength": '100',
+                "name": 'email',
+                "type": 'email',
+            })
+        self.assertNotEqual(email_input_attr, None)
+        email_input_attr = soup.find(
+            'input',
+            attrs={
+                "maxlength": '100',
+                "name": 'password',
+                "type": 'password',
+            })
+        self.assertNotEqual(email_input_attr, None)
+        submit_btn_attr = soup.find(
+            'input',
+            attrs={
+                "type": 'submit',
+                "value": 'Submit',
+            })
+        self.assertNotEqual(submit_btn_attr, None)
+
 #Forms tests
-class TestSubscribersForms(TestCase):
+class TestSubscriptionForm(TestCase):
 
     def test_form_validates_email(self):
         data = {'email': 'blabla'}
         form = SubscriptionForm(data)
         self.assertEqual(form.is_valid(), False)
         data = {'email': 'alex@blabla.com'}
+        form = SubscriptionForm(data)
+        self.assertEqual(form.is_valid(), True)
+
+class TestLoginForm(TestCase):
+
+    def test_form_validates_email(self):
+        data = {'email': 'blabla', 'password': 'blabla'}
+        form = SubscriptionForm(data)
+        self.assertEqual(form.is_valid(), False)
+        data = {'email': 'alex@blabla.com', 'password': 'blabla'}
         form = SubscriptionForm(data)
         self.assertEqual(form.is_valid(), True)
 
@@ -181,6 +233,10 @@ class TestLoginView(TestCase):
         response = self.client.get(reverse('login'), follow=True)
         self.assertTemplateUsed(response, 'subscribers/login.html')
         self.assertTemplateUsed(response, 'base.html')
+
+    def test_home_view_context_with_post_request(self):
+        response = self.client.get(reverse('home'), follow=True)
+        self.assertTrue('form' in response.context)
 
 class TestConfirmationView(TestCase):
     def setUp(self):
