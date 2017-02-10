@@ -16,11 +16,12 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from subscribers.views import HomeView
+from subscribers.views import ConfirmationView, HomeView, LoginView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #subscribers app
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^(?P<ref_code>\S+)$', HomeView.as_view(), name='home_when_referred'),
+    url(r'^confirmation/$', ConfirmationView.as_view(), name='confirmation_prompt'),
 ]

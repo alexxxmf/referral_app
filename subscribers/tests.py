@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from unittest.mock import Mock, patch
 
 from django.contrib.sessions.models import Session
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.test import Client, RequestFactory, TestCase
@@ -43,6 +43,14 @@ class TestHomeBehavior(TestCase):
             '?ref_code=' +
             subscriber_1.unique_code,
         )
+        #about storing sessions
+        #http://stackoverflow.com/questions/4453764/how-do-i-modify-the-session-in-the-django-test-framework
+        session_key = response_get.cookies.get('sessionid', False).value
+        session = Session.objects.get(session_key=session_key)
+        uid = session.get_decoded().get('ref_code')
+        s = self.client.session
+        s['ref_code'] = uid
+        self.client.cookies['sessionid'] = session_key
 
         response_post = self.client.post(
             reverse('home') +
@@ -52,9 +60,38 @@ class TestHomeBehavior(TestCase):
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
+
+
         subscriber_2 = Subscriber.objects.filter(email='a@hot.com').first()
         self.assertNotEqual(subscriber_2, None)
+        self.assertTrue(subscriber_2.referred, True)
+        self.assertEqual(subscriber_2.email_from_referrer, 'abel@hot.com')
+        self.assertEqual(response_post.url, reverse('confirmation_prompt'))
 
+    def test_subscriber_already_in_db_without_confirmation(self):
+        subscriber = Subscriber.objects.create(email='a@hot.com')
+
+        response_post = self.client.post(
+            reverse('home'),
+            {'email':'b@hot.com'},
+            HTTP_REMOTE_ADDR='127.0.0.1'
+        )
+        response_post.session
+
+        self.assertEqual(response_post.url, reverse('confirmation_prompt'))
+
+    def test_subscriber_already_in_db_with_confirmation(self):
+        subscriber = Subscriber.objects.create(email='b@hot.com')
+        subscriber.confirmed_subscription = True
+        subscriber.save()
+
+        response_post = self.client.post(
+            reverse('home'),
+            {'email':'a@hot.com'},
+            HTTP_REMOTE_ADDR='127.0.0.1'
+        )
+
+        self.assertEqual(response_post.url, reverse('login'))
 
 
 #Templates tests
