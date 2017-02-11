@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 
-from subscribers.forms import SubscriptionForm
+from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
 from subscribers.models import Subscriber
 from subscribers.views import HomeView, LoginView, ConfirmationView
 
@@ -200,11 +200,18 @@ class TestLoginForm(TestCase):
 
     def test_form_validates_email(self):
         data = {'email': 'blabla', 'password': 'blabla'}
-        form = SubscriptionForm(data)
+        form = LoginForm(data)
         self.assertEqual(form.is_valid(), False)
         data = {'email': 'alex@blabla.com', 'password': 'blabla'}
-        form = SubscriptionForm(data)
+        form = LoginForm(data)
         self.assertEqual(form.is_valid(), True)
+
+class TestPasswordCreationForm(TestCase):
+
+    def test_form_validates_password(self):
+        data = {'email': 'blabla', 'password': 'blabla'}
+        form = PasswordCreationForm(data)
+        self.assertEqual(form.is_valid(), False)
 
 #Views tests
 class TestHomeView(TestCase):
@@ -269,6 +276,16 @@ class TestConfirmationView(TestCase):
         self.assertTemplateUsed(response, 'subscribers/confirmation.html')
         self.assertTemplateUsed(response, 'base.html')
 
+class TestMailChimpListenerView(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_confirmation_view_does_not_accept_get_requests(self):
+        get_request = self.factory.get(reverse('mailchimp_listener'))
+        response = self.confirmation_view.get(get_request)
+        self.assertEqual(response.status_code, 200)
+
+
 #Remember to apply DRy and create a class that inherits from TestCase with 
 #RequestFactory within factory attr and make all view testcases inherit from it
 class TestCreatePassword(TestCase):
@@ -285,6 +302,10 @@ class TestCreatePassword(TestCase):
         response = self.client.get(reverse('create_password'), follow=True)
         self.assertTemplateUsed(response, 'subscribers/create_password.html')
         self.assertTemplateUsed(response, 'base.html')
+
+    def test_home_view_context_with_post_request(self):
+        response = self.client.get(reverse('create_password'), follow=True)
+        self.assertTrue('form' in response.context)
 
 #Models tests
 class TestSubscribersModels(TestCase):

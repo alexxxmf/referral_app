@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 
 
-from subscribers.forms import LoginForm, SubscriptionForm
+from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
 from subscribers.models import Subscriber
 
 class HomeView(TemplateView):
@@ -108,7 +108,10 @@ class CreatePassword(TemplateView):
 	template_name = 'create_password.html'
 
 	def get(self, request):
-		context = {}
+		form = PasswordCreationForm()
+		context = {
+			'form': form,
+		}
 
 		return render(
 			request,
@@ -123,7 +126,7 @@ class CreatePassword(TemplateView):
 class MailChimpListenerView(TemplateView):
 
 	def get(self, request):
-		return redirect(reverse('home'))
+		pass
 
 	def post(self, request):
 		pass
