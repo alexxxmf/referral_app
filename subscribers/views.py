@@ -104,6 +104,21 @@ class ConfirmationView(TemplateView):
 			context
 		)
 
+class CreatePassword(TemplateView):
+	template_name = 'create_password.html'
+
+	def get(self, request):
+		context = {}
+
+		return render(
+			request,
+			'subscribers/create_password.html',
+			context
+		)
+
+	def post(self, request):
+		pass
+
 
 class MailChimpListenerView(TemplateView):
 

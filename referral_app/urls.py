@@ -16,13 +16,14 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from subscribers.views import ConfirmationView, HomeView, LoginView
+from subscribers.views import ConfirmationView, HomeView, LoginView, CreatePassword
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #subscribers app
-    url(r'^login/$', LoginView.as_view(), name='login'),
-    url(r'^confirmation/$', ConfirmationView.as_view(), name='confirmation_prompt'),
+    url(r'^create_password$', CreatePassword.as_view(), name='create_password'),
+    url(r'^login$', LoginView.as_view(), name='login'),
+    url(r'^confirmation$', ConfirmationView.as_view(), name='confirmation_prompt'),
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^(?P<ref_code>\S+)$', HomeView.as_view(), name='home_when_referred'),
 ]

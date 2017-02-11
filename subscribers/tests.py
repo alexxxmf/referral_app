@@ -143,7 +143,8 @@ class TestLoginTemplate(TestCase):
                 "action": reverse('login'),
                 "method": 'post',
                 "role": 'form',
-            })
+            }
+        )
         self.assertNotEqual(form_html_attr, None)
         email_input_attr = soup.find(
             'input',
@@ -151,23 +152,38 @@ class TestLoginTemplate(TestCase):
                 "maxlength": '100',
                 "name": 'email',
                 "type": 'email',
-            })
+            }
+        )
         self.assertNotEqual(email_input_attr, None)
-        email_input_attr = soup.find(
+        password_input_attr = soup.find(
             'input',
             attrs={
-                "maxlength": '100',
                 "name": 'password',
                 "type": 'password',
-            })
-        self.assertNotEqual(email_input_attr, None)
+            }
+        )
+        self.assertNotEqual(password_input_attr, None)
         submit_btn_attr = soup.find(
             'input',
             attrs={
                 "type": 'submit',
                 "value": 'Submit',
-            })
+            }
+        )
         self.assertNotEqual(submit_btn_attr, None)
+
+class TestConfirmationTemplate(TestCase):
+
+    def test_confirmation_template_content_rendered_properly(self):
+        response = self.client.get(reverse('confirmation_prompt'), follow=True)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        main_prompt = soup.find(
+            'h1',
+            attrs={
+                "id": 'main_confirmation_prompt',
+            }
+        )
+        self.assertNotEqual(main_prompt, None)
 
 #Forms tests
 class TestSubscriptionForm(TestCase):
@@ -253,7 +269,22 @@ class TestConfirmationView(TestCase):
         self.assertTemplateUsed(response, 'subscribers/confirmation.html')
         self.assertTemplateUsed(response, 'base.html')
 
+#Remember to apply DRy and create a class that inherits from TestCase with 
+#RequestFactory within factory attr and make all view testcases inherit from it
+class TestCreatePassword(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.confirmation_view = ConfirmationView()
 
+    def test_createpassword_view_200_response(self):
+        get_request = self.factory.get(reverse('create_password'))
+        response = self.confirmation_view.get(get_request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_createpassword_view_loads_right_template(self):
+        response = self.client.get(reverse('create_password'), follow=True)
+        self.assertTemplateUsed(response, 'subscribers/create_password.html')
+        self.assertTemplateUsed(response, 'base.html')
 
 #Models tests
 class TestSubscribersModels(TestCase):
