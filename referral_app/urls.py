@@ -16,11 +16,12 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from subscribers.views import ConfirmationView, HomeView, LoginView, CreatePassword
-
+from subscribers.views import ConfirmationView, HomeView, MailChimpListenerView, LoginView, CreatePassword
+#mailchimp_listener
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #subscribers app
+    url(r'^mc-listener$', MailChimpListenerView.as_view(), name='mailchimp_listener'),
     url(r'^create_password$', CreatePassword.as_view(), name='create_password'),
     url(r'^login$', LoginView.as_view(), name='login'),
     url(r'^confirmation$', ConfirmationView.as_view(), name='confirmation_prompt'),

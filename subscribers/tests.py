@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
 from subscribers.models import Subscriber
-from subscribers.views import HomeView, LoginView, ConfirmationView
+from subscribers.views import HomeView, LoginView, MailChimpListenerView, ConfirmationView
 
 #Integration tests
 class TestHomeBehavior(TestCase):
@@ -279,11 +279,12 @@ class TestConfirmationView(TestCase):
 class TestMailChimpListenerView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
+        self.ml_listener_view = MailChimpListenerView()
 
     def test_confirmation_view_does_not_accept_get_requests(self):
         get_request = self.factory.get(reverse('mailchimp_listener'))
-        response = self.confirmation_view.get(get_request)
-        self.assertEqual(response.status_code, 200)
+        response = self.ml_listener_view.get(get_request)
+        self.assertEqual(response.status_code, 404)
 
 
 #Remember to apply DRy and create a class that inherits from TestCase with 

@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, render_to_response, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
@@ -126,7 +126,9 @@ class CreatePassword(TemplateView):
 class MailChimpListenerView(TemplateView):
 
 	def get(self, request):
-		pass
+		context = {}
+
+		return render_to_response("404.html", context, status=404)
 
 	def post(self, request):
 		pass
