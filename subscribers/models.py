@@ -14,12 +14,15 @@ class Subscriber(models.Model):
 	email = models.EmailField(unique=True)
 	email_from_referrer = models.EmailField(null=True, blank=True)
 	ip = models.CharField(max_length=30)
+	password = models.CharField(max_length=40)
 	referral_count = models.IntegerField(default=0)
 	referred = models.BooleanField(default=False)
 	unique_code = models.CharField(max_length=120, unique=True)
 
+
 	def save(self, *args, **kwargs):
 		self.unique_code = uuid.uuid4().hex
+		self.password = self.unique_code[0:9]
 
 		super().save(*args, **kwargs)
 

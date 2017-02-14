@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from subscribers.forms import SubscriptionForm
 from subscribers.models import Subscriber
-from subscribers.views import HomeView, LoginView, ConfirmationView
+from subscribers.views import HomeView, LoginView, ConfirmationView, MailChimpListenerView
 
 #Integration tests
 class TestHomeBehavior(TestCase):
@@ -103,7 +103,7 @@ class TestHomeBehavior(TestCase):
         self.assertEqual(response_post.url, reverse('login'))
 
 
-#Templates tests
+#TEMPLATES tests
 class TestHomeTemplate(TestCase):
 
     def test_home_template_title(self):
@@ -179,7 +179,7 @@ class TestLoginTemplate(TestCase):
             })
         self.assertNotEqual(submit_btn_attr, None)
 
-#Forms tests
+#FORMS tests
 class TestSubscriptionForm(TestCase):
 
     def test_form_validates_email(self):
@@ -200,7 +200,7 @@ class TestLoginForm(TestCase):
         form = SubscriptionForm(data)
         self.assertEqual(form.is_valid(), True)
 
-#Views tests
+#VIEWS tests
 class TestHomeView(TestCase):
 
     def setUp(self):
@@ -263,21 +263,39 @@ class TestConfirmationView(TestCase):
         self.assertTemplateUsed(response, 'subscribers/confirmation.html')
         self.assertTemplateUsed(response, 'base.html')
 
+class TestMailChimpListenerView(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.mc_listener_view = MailChimpListenerView()
+
+    def test_MailChimpListener_view_does_not_accept_get_requests(self):
+        get_request = self.factory.get(reverse('mc-listener'))
+        response = self.mc_listener_view.get(get_request)
+        self.assertEqual(response.status_code, 400)
+
+    def test_MailChimpListener_view_does_accept_get_requests(self):
+        post_request = self.factory.get(reverse('mc-listener'))
+        response = self.mc_listener_view.post(post_request)
+        self.assertEqual(response.status_code, 200)
 
 
-#Models tests
+
+
+#MODELS TESTS
 class TestSubscribersModels(TestCase):
     def test_some_subscriber_fields(self):
         subscriber = Subscriber.objects.create(email='alex@test.com')
         self.assertEqual(subscriber.email, 'alex@test.com')
         self.assertEqual(str(subscriber), subscriber.email)
+        self.assertNotEqual(len(subscriber.unique_code), 0)
+        self.assertEqual(subscriber.unique_code[0:9], subscriber.password)
 
     def test_subscriber_default_fields_when_not_referred(self):
         subscriber = Subscriber.objects.create(email='alex@test.com')
         self.assertEqual(subscriber.confirmed_subscription, False)
         self.assertEqual(subscriber.referred, False)
         self.assertEqual(subscriber.referral_count, 0)
-        self.assertNotEqual(len(subscriber.unique_code), 0)
+
 
     def test_subscriber_model_in_db(self):
         subscriber_created = Subscriber.objects.create(

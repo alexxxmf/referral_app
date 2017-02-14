@@ -1,6 +1,6 @@
 from mailchimp3 import MailChimp
 
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
 from django.shortcuts import render, render_to_response, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
@@ -123,7 +123,7 @@ class ConfirmationView(TemplateView):
 class MailChimpListenerView(TemplateView):
 
 	def get(self, request):
-		return redirect(reverse('home'))
+		return HttpResponseBadRequest()
 
 	def post(self, request):
-		pass
+		return 'ok'
