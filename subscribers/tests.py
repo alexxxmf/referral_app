@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from override_settings import override_settings
 from unittest.mock import Mock, patch
 
 from django.contrib.sessions.models import Session
@@ -33,8 +34,14 @@ class TestHomeBehavior(TestCase):
         uid = session.get_decoded().get('ref_code')
         self.assertEqual(uid, subscriber_1.unique_code)
 
-    def test_subscriber_created_and_redirected_when_right_ref_code(self):
+
+    @patch('subscribers.views.MailChimp')
+    def test_subscriber_created_and_redirected_when_right_ref_code(self, MailChimp):
         #we have to check user is properly created and it's been properly redirected
+        mc_client_instance_mock = Mock()
+        mc_client_instance_mock.member.create.return_value = 'Service correctly called'
+
+        MailChimp.return_value = mc_client_instance_mock
 
         subscriber_1 = Subscriber.objects.create(email='abel@hot.com')
         #we have to create a session for the ref_code
@@ -60,6 +67,9 @@ class TestHomeBehavior(TestCase):
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
+        self.assertTrue(MailChimp.called)
+        self.assertTrue(mc_client_instance_mock.member.create)
+
         subscriber_2 = Subscriber.objects.filter(email='a@hot.com').first()
         self.assertNotEqual(subscriber_2, None)
         self.assertTrue(subscriber_2.referred, True)
@@ -67,17 +77,18 @@ class TestHomeBehavior(TestCase):
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
     #in tests not working but working properly when running server
     #wtf is happening??!!!
+    #'''
     def test_subscriber_already_in_db_without_confirmation(self):
         subscriber = Subscriber.objects.create(email='a@hot.com')
 
         response_post = self.client.post(
             reverse('home'),
-            {'email':'b@hot.com'},
+            {'email':'a@hot.com'},
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
-
+    #'''
     def test_subscriber_already_in_db_with_confirmation(self):
         subscriber = Subscriber.objects.create(email='b@hot.com')
         subscriber.confirmed_subscription = True
@@ -153,14 +164,13 @@ class TestLoginTemplate(TestCase):
                 "type": 'email',
             })
         self.assertNotEqual(email_input_attr, None)
-        email_input_attr = soup.find(
+        password_input_attr = soup.find(
             'input',
             attrs={
-                "maxlength": '100',
                 "name": 'password',
                 "type": 'password',
             })
-        self.assertNotEqual(email_input_attr, None)
+        self.assertNotEqual(password_input_attr, None)
         submit_btn_attr = soup.find(
             'input',
             attrs={

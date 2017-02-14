@@ -1,11 +1,18 @@
+from mailchimp3 import MailChimp
+
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-
+from referral_app.settings import MAILCHIMP_USERNAME, MAILCHIMP_API_KEY, SUBSCRIBERS_LIST_ID
 from subscribers.forms import LoginForm, SubscriptionForm
 from subscribers.models import Subscriber
+
+#mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
+#print('===========VIEW===========')
+#print(MailChimp)
+
 
 class HomeView(TemplateView):
 	template_name = 'home.html'
@@ -26,6 +33,7 @@ class HomeView(TemplateView):
 		)
 	#Check if it is compulsory to set a default for ref_code as in Flask
 	def post(self, request, ref_code=None):
+		mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
 		form = SubscriptionForm(request.POST)
 		#if valid ref code means it's referred by someone
 		if form.is_valid():
@@ -56,6 +64,13 @@ class HomeView(TemplateView):
 			#should I add here a context depending if the user is created or not
 			#but w/o confirmation
 			if created:
+				mc_client.member.create(
+					SUBSCRIBERS_LIST_ID, {
+						'email_address': email,
+						'status': 'pending'
+					}
+				)
+
 				return redirect(reverse('confirmation_prompt'))
 
 			elif subscriber.confirmed_subscription == False:
