@@ -1,0 +1,23 @@
+Explanation for MailChimp Integration
+
+1/ Create a MailChimp account if you don't have one
+
+2/ Create a List. Name is not important but I opted for choosing something
+easy to identify. In this case, Subscribers.
+
+3/ Click on the list name you have just created. Go to settings and then webhooks.
+
+4/ There you can create a webhook for your app to listen to the MailChimp events you
+want to subscribe to. For example, if you set it up to listen just for subscriptions, whenever somebody subscribes to your list, MailChimp will snd to the webhook url you set a POST request with some info about that subscription. 
+That way you can easily sync your app with MailChimp service and react based on the conditions you establish in yur app
+
+5/ Think about what events do you want to listen to and in which way do you want your ap to behave. 
+In this case, we just want to listen to subscriptions and unsubscriptions to properly update some field within the db and add some referral points to referrers whenever a referree confirms subscription.
+
+6/ For your app you will need the id of the list. You can get it easily via MailChimp API.
+
+7/ You can get your API key if you go to your profile. Then click on extras and then API keys button. Create your API key and keep it safe.
+
+
+lists>name of the list>settings and then ...
+unique id for list subscribers
