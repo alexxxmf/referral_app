@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from override_settings import override_settings
 from unittest.mock import Mock, patch
 
 from django.contrib.sessions.models import Session
@@ -10,11 +9,8 @@ from django.urls import reverse
 
 from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
 from subscribers.models import Subscriber
-<<<<<<< HEAD
 from subscribers.views import HomeView, LoginView, MailChimpListenerView, ConfirmationView
-=======
-from subscribers.views import HomeView, LoginView, ConfirmationView, MailChimpListenerView
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
+
 
 #Integration tests
 class TestHomeBehavior(TestCase):
@@ -175,12 +171,9 @@ class TestLoginTemplate(TestCase):
             attrs={
                 "name": 'password',
                 "type": 'password',
-<<<<<<< HEAD
             }
         )
-=======
-            })
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
+
         self.assertNotEqual(password_input_attr, None)
         submit_btn_attr = soup.find(
             'input',
@@ -191,7 +184,6 @@ class TestLoginTemplate(TestCase):
         )
         self.assertNotEqual(submit_btn_attr, None)
 
-<<<<<<< HEAD
 class TestConfirmationTemplate(TestCase):
 
     def test_confirmation_template_content_rendered_properly(self):
@@ -205,10 +197,8 @@ class TestConfirmationTemplate(TestCase):
         )
         self.assertNotEqual(main_prompt, None)
 
-#Forms tests
-=======
+
 #FORMS tests
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
 class TestSubscriptionForm(TestCase):
 
     def test_form_validates_email(self):
@@ -229,7 +219,7 @@ class TestLoginForm(TestCase):
         form = LoginForm(data)
         self.assertEqual(form.is_valid(), True)
 
-<<<<<<< HEAD
+
 class TestPasswordCreationForm(TestCase):
 
     def test_form_validates_password(self):
@@ -237,10 +227,8 @@ class TestPasswordCreationForm(TestCase):
         form = PasswordCreationForm(data)
         self.assertEqual(form.is_valid(), False)
 
-#Views tests
-=======
+
 #VIEWS tests
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
 class TestHomeView(TestCase):
 
     def setUp(self):
@@ -306,26 +294,13 @@ class TestConfirmationView(TestCase):
 class TestMailChimpListenerView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-<<<<<<< HEAD
-        self.ml_listener_view = MailChimpListenerView()
-
-    def test_confirmation_view_does_not_accept_get_requests(self):
-        get_request = self.factory.get(reverse('mailchimp_listener'))
-        response = self.ml_listener_view.get(get_request)
-        self.assertEqual(response.status_code, 404)
-=======
         self.mc_listener_view = MailChimpListenerView()
 
     def test_MailChimpListener_view_does_not_accept_get_requests(self):
-        get_request = self.factory.get(reverse('mc-listener'))
+        get_request = self.factory.get(reverse('mailchimp_listener'))
         response = self.mc_listener_view.get(get_request)
         self.assertEqual(response.status_code, 400)
 
-    def test_MailChimpListener_view_does_accept_get_requests(self):
-        post_request = self.factory.get(reverse('mc-listener'))
-        response = self.mc_listener_view.post(post_request)
-        self.assertEqual(response.status_code, 200)
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
 
 
 #Remember to apply DRy and create a class that inherits from TestCase with 
@@ -345,7 +320,7 @@ class TestCreatePassword(TestCase):
         self.assertTemplateUsed(response, 'subscribers/create_password.html')
         self.assertTemplateUsed(response, 'base.html')
 
-    def test_home_view_context_with_post_request(self):
+    def test_createpassword_view_context_with_post_request(self):
         response = self.client.get(reverse('create_password'), follow=True)
         self.assertTrue('form' in response.context)
 

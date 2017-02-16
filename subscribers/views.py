@@ -1,21 +1,12 @@
-<<<<<<< HEAD
-from django.http import HttpResponse, HttpResponseNotFound, Http404
-=======
 from mailchimp3 import MailChimp
 
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
 from django.shortcuts import render, render_to_response, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-<<<<<<< HEAD
-
-from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
-=======
 from referral_app.settings import MAILCHIMP_USERNAME, MAILCHIMP_API_KEY, SUBSCRIBERS_LIST_ID
-from subscribers.forms import LoginForm, SubscriptionForm
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
+from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
 from subscribers.models import Subscriber
 
 #mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
@@ -150,13 +141,11 @@ class CreatePassword(TemplateView):
 class MailChimpListenerView(TemplateView):
 
 	def get(self, request):
-<<<<<<< HEAD
+
 		context = {}
 
-		return render_to_response("404.html", context, status=404)
-=======
 		return HttpResponseBadRequest()
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
+
 
 	def post(self, request):
 		return 'ok'

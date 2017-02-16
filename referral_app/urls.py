@@ -16,7 +16,6 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-<<<<<<< HEAD
 from subscribers.views import ConfirmationView, HomeView, MailChimpListenerView, LoginView, CreatePassword
 #mailchimp_listener
 urlpatterns = [
@@ -26,16 +25,6 @@ urlpatterns = [
     url(r'^create_password$', CreatePassword.as_view(), name='create_password'),
     url(r'^login$', LoginView.as_view(), name='login'),
     url(r'^confirmation$', ConfirmationView.as_view(), name='confirmation_prompt'),
-=======
-from subscribers.views import ConfirmationView, HomeView, LoginView, MailChimpListenerView
-
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    #subscribers app
-    url(r'^mc-listener$', MailChimpListenerView.as_view(), name='mc-listener'),
-    url(r'^login/$', LoginView.as_view(), name='login'),
-    url(r'^confirmation/$', ConfirmationView.as_view(), name='confirmation_prompt'),
->>>>>>> 3fc5d5caf7a4a5e188b3ecdf9f10a27412da1559
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^(?P<ref_code>\S+)$', HomeView.as_view(), name='home_when_referred'),
 ]
