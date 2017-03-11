@@ -1,15 +1,24 @@
-from bs4 import BeautifulSoup
 from unittest.mock import Mock, patch
+
+from bs4 import BeautifulSoup
 
 from django.contrib.sessions.models import Session
 from django.db.utils import IntegrityError
-from django.http import HttpResponse
-from django.test import Client, RequestFactory, TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
-from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
+from subscribers.forms import (
+    LoginForm,
+    PasswordCreationForm,
+    SubscriptionForm
+)
 from subscribers.models import Subscriber
-from subscribers.views import HomeView, LoginView, MailChimpListenerView, ConfirmationView
+from subscribers.views import (
+    ConfirmationView,
+    HomeView,
+    LoginView,
+    MailChimpListenerView
+)
 
 
 # Integration tests
@@ -34,14 +43,18 @@ class TestHomeBehavior(TestCase):
         uid = session.get_decoded().get('ref_code')
         self.assertEqual(uid, subscriber_1.unique_code)
 
-
     @patch('subscribers.views.MailChimp')
-    def test_subscriber_created_and_redirected_when_right_ref_code(self, MailChimp):
-        # we have to check user is properly created and it's been properly redirected
+    def test_subscriber_created_and_redirected_when_right_ref_code(
+        self,
+        mailchimp
+    ):
+        # we have to check user is properly created and it's
+        # been properly redirected
         mc_client_instance_mock = Mock()
-        mc_client_instance_mock.member.create.return_value = 'Service correctly called'
+        message = 'Service correctly called'
+        mc_client_instance_mock.member.create.return_value = message
 
-        MailChimp.return_value = mc_client_instance_mock
+        mailchimp.return_value = mc_client_instance_mock
 
         subscriber_1 = Subscriber.objects.create(email='abel@hot.com')
         # we have to create a session for the ref_code
@@ -67,7 +80,7 @@ class TestHomeBehavior(TestCase):
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
-        self.assertTrue(MailChimp.called)
+        self.assertTrue(mailchimp.called)
         self.assertTrue(mc_client_instance_mock.member.create)
 
         subscriber_2 = Subscriber.objects.filter(email='a@hot.com').first()
@@ -79,15 +92,16 @@ class TestHomeBehavior(TestCase):
     # in tests not working but working properly when running server
     # wtf is happening??!!!
     def test_subscriber_already_in_db_without_confirmation(self):
-        subscriber = Subscriber.objects.create(email='a@hot.com')
+        Subscriber.objects.create(email='a@hot.com')
 
         response_post = self.client.post(
             reverse('home'),
-            {'email':'a@hot.com'},
+            {'email': 'a@hot.com'},
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
+
     def test_subscriber_already_in_db_with_confirmation(self):
         subscriber = Subscriber.objects.create(email='b@hot.com')
         subscriber.confirmed_subscription = True
@@ -301,14 +315,15 @@ class TestMailChimpListenerView(TestCase):
         self.factory = RequestFactory()
         self.mc_listener_view = MailChimpListenerView()
 
-    def test_MailChimpListener_view_does_not_accept_get_requests(self):
+    def test_mailchimplistener_view_does_not_accept_get_requests(self):
         get_request = self.factory.get(reverse('mailchimp_listener'))
         response = self.mc_listener_view.get(get_request)
         self.assertEqual(response.status_code, 400)
 
 
-# Remember to apply DRy and create a class that inherits from TestCase with 
-# RequestFactory within factory attr and make all view testcases inherit from it
+# Remember to apply DRy and create a class that inherits from TestCase
+#  with RequestFactory within factory attr and make all view
+# testcases inherit from it
 class TestCreatePassword(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -351,13 +366,19 @@ class TestSubscribersModels(TestCase):
             referred=True,
             email_from_referrer='pepe@hotmail.com',
         )
-        subscriber_pulled = Subscriber.objects.filter(email='alex@test.com').first()
+        subscriber_pulled = Subscriber.objects.filter(
+            email='alex@test.com'
+        ).first()
+
         self.assertEqual(subscriber_created.email, subscriber_pulled.email)
         self.assertEqual(subscriber_pulled.ip, '127.0.0.0')
         self.assertEqual(subscriber_pulled.referred, True)
-        self.assertEqual(subscriber_pulled.email_from_referrer, 'pepe@hotmail.com')
+        self.assertEqual(
+            subscriber_pulled.email_from_referrer,
+            'pepe@hotmail.com'
+        )
 
     def test_subscriber_email_unique(self):
-        subscriber_created_1 = Subscriber.objects.create(email='alex@test.com')
+        Subscriber.objects.create(email='alex@test.com')
         with self.assertRaises(IntegrityError):
-            subscriber_created_2 = Subscriber.objects.create(email='alex@test.com')
+            Subscriber.objects.create(email='alex@test.com')

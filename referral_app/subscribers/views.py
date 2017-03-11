@@ -1,145 +1,154 @@
-from mailchimp3 import MailChimp
-
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
-from django.shortcuts import render, render_to_response, redirect
+from django.http import HttpResponseBadRequest
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-from referral_app.settings import MAILCHIMP_USERNAME, MAILCHIMP_API_KEY, SUBSCRIBERS_LIST_ID
-from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
+from mailchimp3 import MailChimp
+
+from referral_app.settings import (
+    MAILCHIMP_API_KEY,
+    MAILCHIMP_USERNAME,
+    SUBSCRIBERS_LIST_ID
+)
+
+from subscribers.forms import LoginForm, PasswordCreationForm, SubscriptionForm
 from subscribers.models import Subscriber
 
 
 class HomeView(TemplateView):
-	template_name = 'home.html'
+    template_name = 'home.html'
 
-	def get(self, request, ref_code=None):
-		form = SubscriptionForm()
-		context = {
-			'form': form,
-		}
-		ref_code = request.GET.get('ref_code', None)
-		if ref_code:
-			request.session['ref_code'] = ref_code
+    def get(self, request, ref_code=None):
+        form = SubscriptionForm()
+        context = {
+            'form': form,
+        }
+        ref_code = request.GET.get('ref_code', None)
+        if ref_code:
+            request.session['ref_code'] = ref_code
 
-		return render(
-			request,
-			'subscribers/home.html',
-			context
-		)
-	#Check if it is compulsory to set a default for ref_code as in Flask
-	def post(self, request, ref_code=None):
-		mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
-		form = SubscriptionForm(request.POST)
-		#if valid ref code means it's referred by someone
-		if form.is_valid():
-			email = form.cleaned_data['email']
-			ip_from_user = request.META.get('REMOTE_ADDR', '0')
+        return render(
+            request,
+            'subscribers/home.html',
+            context
+        )
 
-			if request.session.get('ref_code', False):
-				email_from_referrer = Subscriber.objects.filter(unique_code=request.session['ref_code']).first()
-				if email_from_referrer:
-					referred = True
-				else:
-					referred = False
-			else:
-				email_from_referrer = None
-				referred = False
+    # Check if it is compulsory to set a default for ref_code as in Flask
+    def post(self, request, ref_code=None):
+        mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
+        form = SubscriptionForm(request.POST)
+        # if valid ref code means it's referred by someone
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            ip_from_user = request.META.get('REMOTE_ADDR', '0')
 
-			subscriber, created = Subscriber.objects.get_or_create(
-			    email=email,
-			    defaults={
-					'ip': ip_from_user,
-					'email_from_referrer': email_from_referrer,
-					'referred': referred,
-				},
-			)
-			#better to force confirmation to update referral count from referrer
-			#referrer = Subscriber.objects.filter(email=email_from_referrer).update(referral_count=F('referral_count') + 1)
-			subscriber = Subscriber.objects.filter(email=email).first()
-			#should I add here a context depending if the user is created or not
-			#but w/o confirmation
-			if created:
-				mc_client.member.create(
-					SUBSCRIBERS_LIST_ID, {
-						'email_address': email,
-						'status': 'pending'
-					}
-				)
+            if request.session.get('ref_code', False):
+                email_from_referrer = Subscriber.objects.filter(
+                    unique_code=request.session['ref_code']
+                ).first()
+                if email_from_referrer:
+                    referred = True
+                else:
+                    referred = False
+            else:
+                email_from_referrer = None
+                referred = False
 
-				return redirect(reverse('confirmation_prompt'))
+            subscriber, created = Subscriber.objects.get_or_create(
+                email=email,
+                defaults={
+                    'ip': ip_from_user,
+                    'email_from_referrer': email_from_referrer,
+                    'referred': referred,
+                },
+            )
+            # better to force confirmation to update referral count
+            subscriber = Subscriber.objects.filter(email=email).first()
+            # should I add here a context depending if the user is created or
+            # not but w/o confirmation
+            if created:
+                mc_client.member.create(
+                    SUBSCRIBERS_LIST_ID, {
+                        'email_address': email,
+                        'status': 'pending'
+                    }
+                )
 
-			elif subscriber.confirmed_subscription == False:
-				return redirect(reverse('confirmation_prompt'))
+                return redirect(reverse('confirmation_prompt'))
 
-			else:
-				return redirect(reverse('login'))
+            elif subscriber.confirmed_subscription == False:
+                return redirect(reverse('confirmation_prompt'))
 
-		context = {
-			'form': form,
-		}
-		return render(
-			request,
-			'subscribers/home.html',
-			context
-		)
+            else:
+                return redirect(reverse('login'))
+
+        context = {
+            'form': form,
+        }
+        return render(
+            request,
+            'subscribers/home.html',
+            context
+        )
+
 
 class LoginView(TemplateView):
-	template_name = 'login.html'
+    template_name = 'login.html'
 
-	def get(self, request):
-		form = LoginForm()
+    def get(self, request):
+        form = LoginForm()
 
-		context = {
-			'form': form,
-		}
+        context = {
+            'form': form,
+        }
 
-		return render(
-			request,
-			'subscribers/login.html',
-			context
-		)
+        return render(
+            request,
+            'subscribers/login.html',
+            context
+        )
 
-	def post(self, request):
-		pass
+    def post(self, request):
+        pass
+
 
 class ConfirmationView(TemplateView):
-	template_name = 'confirmation.html'
+    template_name = 'confirmation.html'
 
-	def get(self, request):
-		context = {}
+    def get(self, request):
+        context = {}
 
-		return render(
-			request,
-			'subscribers/confirmation.html',
-			context
-		)
+        return render(
+            request,
+            'subscribers/confirmation.html',
+            context
+        )
+
 
 class CreatePassword(TemplateView):
-	template_name = 'create_password.html'
+    template_name = 'create_password.html'
 
-	def get(self, request):
-		form = PasswordCreationForm()
-		context = {
-			'form': form,
-		}
+    def get(self, request):
+        form = PasswordCreationForm()
+        context = {
+            'form': form,
+        }
 
-		return render(
-			request,
-			'subscribers/create_password.html',
-			context
-		)
+        return render(
+            request,
+            'subscribers/create_password.html',
+            context
+        )
 
-	def post(self, request):
-		pass
+    def post(self, request):
+        pass
 
 
 class MailChimpListenerView(TemplateView):
 
-	def get(self, request):
+    def get(self, request):
 
-		return HttpResponseBadRequest()
+        return HttpResponseBadRequest()
 
-
-	def post(self, request):
-		return 'ok'
+    def post(self, request):
+        return 'ok'
