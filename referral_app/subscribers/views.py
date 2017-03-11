@@ -1,7 +1,13 @@
-from django.http import HttpResponseBadRequest
+from braces.views import CsrfExemptMixin
+
+from django.db.models import F
+from django.http import HttpResponse
+# HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
+
+
 
 from mailchimp3 import MailChimp
 
@@ -144,11 +150,26 @@ class CreatePassword(TemplateView):
         pass
 
 
-class MailChimpListenerView(TemplateView):
+class MailChimpListenerView(CsrfExemptMixin, TemplateView):
 
     def get(self, request):
+        r = HttpResponse()
+        return r
 
-        return HttpResponseBadRequest()
-
+    # data from POST is a QueryDict
     def post(self, request):
-        return 'ok'
+        mailchimp_subs_data = request.POST.dict()
+        if mailchimp_subs_data['type'] == 'subscribe':
+            email = mailchimp_subs_data['data[email]']
+            subscriber = Subscriber.objects.filter(email=email).first()
+            subscriber.confirmed_subscription = True
+            subscriber.save()
+
+            if subscriber.referred:
+                Subscriber.objects.filter(
+                    email=subscriber.email_from_referrer
+                ).update(
+                    referral_count=F('referral_count') + 1
+                )
+
+        return HttpResponse('ok')

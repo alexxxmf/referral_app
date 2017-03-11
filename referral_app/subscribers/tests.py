@@ -316,13 +316,42 @@ class TestMailChimpListenerView(TestCase):
         self.mc_listener_view = MailChimpListenerView()
 
     def test_mailchimplistener_view_does_not_accept_get_requests(self):
-        get_request = self.factory.get(reverse('mailchimp_listener'))
-        response = self.mc_listener_view.get(get_request)
-        self.assertEqual(response.status_code, 400)
+        pass
+
+    def test_mailchimplistener_is_csrf_exempt(self):
+        pass
+
+    def test_referrer_count_updated(self):
+        referrer_start_status = Subscriber.objects.create(
+            email='a@hot.com'
+        )
+        subscriber = Subscriber.objects.create(
+            email='b@hot.com',
+            referred=True,
+            email_from_referrer='a@hot.com'
+        )
+        starting_count = referrer_start_status.referral_count
+        data = {'data[email]': 'b@hot.com', 'type': 'subscribe'}
+        post_request = self.factory.post(reverse('mailchimp_listener'), data)
+        self.mc_listener_view.post(post_request)
+        referrer_end_status = Subscriber.objects.filter(
+            email='a@hot.com',
+        ).first()
+
+        subscriber_after_confirmation = Subscriber.objects.filter(
+            email='b@hot.com'
+        ).first()
+
+        self.assertTrue(subscriber_after_confirmation.confirmed_subscription)
+        self.assertEqual(starting_count, 0)
+        self.assertEqual(referrer_end_status.referral_count, 1)
+
+    def test_confirmed_subscription_updates_to_true(self):
+        pass
 
 
 # Remember to apply DRy and create a class that inherits from TestCase
-#  with RequestFactory within factory attr and make all view
+# with RequestFactory within factory attr and make all view
 # testcases inherit from it
 class TestCreatePassword(TestCase):
     def setUp(self):
