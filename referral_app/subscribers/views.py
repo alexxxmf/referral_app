@@ -9,10 +9,6 @@ from referral_app.settings import MAILCHIMP_USERNAME, MAILCHIMP_API_KEY, SUBSCRI
 from subscribers.forms import LoginForm, SubscriptionForm, PasswordCreationForm
 from subscribers.models import Subscriber
 
-#mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
-#print('===========VIEW===========')
-#print(MailChimp)
-
 
 class HomeView(TemplateView):
 	template_name = 'home.html'
@@ -141,8 +137,6 @@ class CreatePassword(TemplateView):
 class MailChimpListenerView(TemplateView):
 
 	def get(self, request):
-
-		context = {}
 
 		return HttpResponseBadRequest()
 

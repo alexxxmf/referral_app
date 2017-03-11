@@ -12,7 +12,7 @@ from subscribers.models import Subscriber
 from subscribers.views import HomeView, LoginView, MailChimpListenerView, ConfirmationView
 
 
-#Integration tests
+# Integration tests
 class TestHomeBehavior(TestCase):
 
     def test_session_created_just_when_ref_code_provided(self):
@@ -37,21 +37,21 @@ class TestHomeBehavior(TestCase):
 
     @patch('subscribers.views.MailChimp')
     def test_subscriber_created_and_redirected_when_right_ref_code(self, MailChimp):
-        #we have to check user is properly created and it's been properly redirected
+        # we have to check user is properly created and it's been properly redirected
         mc_client_instance_mock = Mock()
         mc_client_instance_mock.member.create.return_value = 'Service correctly called'
 
         MailChimp.return_value = mc_client_instance_mock
 
         subscriber_1 = Subscriber.objects.create(email='abel@hot.com')
-        #we have to create a session for the ref_code
+        # we have to create a session for the ref_code
         response_get = self.client.get(
             reverse('home') +
             '?ref_code=' +
             subscriber_1.unique_code,
         )
-        #about storing sessions
-        #http://stackoverflow.com/questions/4453764/how-do-i-modify-the-session-in-the-django-test-framework
+        # about storing sessions
+        # http://stackoverflow.com/questions/4453764/how-do-i-modify-the-session-in-the-django-test-framework
         session_key = response_get.cookies.get('sessionid', False).value
         session = Session.objects.get(session_key=session_key)
         uid = session.get_decoded().get('ref_code')
@@ -63,7 +63,7 @@ class TestHomeBehavior(TestCase):
             reverse('home') +
             '?ref_code=' +
             subscriber_1.unique_code,
-            {'email':'a@hot.com'},
+            {'email': 'a@hot.com'},
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
@@ -75,9 +75,9 @@ class TestHomeBehavior(TestCase):
         self.assertTrue(subscriber_2.referred, True)
         self.assertEqual(subscriber_2.email_from_referrer, 'abel@hot.com')
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
-    #in tests not working but working properly when running server
-    #wtf is happening??!!!
-    #'''
+
+    # in tests not working but working properly when running server
+    # wtf is happening??!!!
     def test_subscriber_already_in_db_without_confirmation(self):
         subscriber = Subscriber.objects.create(email='a@hot.com')
 
@@ -88,7 +88,6 @@ class TestHomeBehavior(TestCase):
         )
 
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
-    #'''
     def test_subscriber_already_in_db_with_confirmation(self):
         subscriber = Subscriber.objects.create(email='b@hot.com')
         subscriber.confirmed_subscription = True
@@ -96,14 +95,14 @@ class TestHomeBehavior(TestCase):
 
         response_post = self.client.post(
             reverse('home'),
-            {'email':'b@hot.com'},
+            {'email': 'b@hot.com'},
             HTTP_REMOTE_ADDR='127.0.0.1'
         )
 
         self.assertEqual(response_post.url, reverse('login'))
 
 
-#TEMPLATES tests
+# TEMPLATES tests
 class TestHomeTemplate(TestCase):
 
     def test_home_template_title(self):
@@ -137,6 +136,7 @@ class TestHomeTemplate(TestCase):
                 "value": 'Submit',
             })
         self.assertNotEqual(submit_btn_attr, None)
+
 
 class TestLoginTemplate(TestCase):
 
@@ -184,6 +184,7 @@ class TestLoginTemplate(TestCase):
         )
         self.assertNotEqual(submit_btn_attr, None)
 
+
 class TestConfirmationTemplate(TestCase):
 
     def test_confirmation_template_content_rendered_properly(self):
@@ -198,7 +199,7 @@ class TestConfirmationTemplate(TestCase):
         self.assertNotEqual(main_prompt, None)
 
 
-#FORMS tests
+# FORMS tests
 class TestSubscriptionForm(TestCase):
 
     def test_form_validates_email(self):
@@ -208,6 +209,7 @@ class TestSubscriptionForm(TestCase):
         data = {'email': 'alex@blabla.com'}
         form = SubscriptionForm(data)
         self.assertEqual(form.is_valid(), True)
+
 
 class TestLoginForm(TestCase):
 
@@ -228,7 +230,7 @@ class TestPasswordCreationForm(TestCase):
         self.assertEqual(form.is_valid(), False)
 
 
-#VIEWS tests
+# VIEWS tests
 class TestHomeView(TestCase):
 
     def setUp(self):
@@ -257,6 +259,7 @@ class TestHomeView(TestCase):
         response = self.client.post(reverse('home'), follow=True)
         self.assertTrue('form' in response.context)
 
+
 class TestLoginView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -276,6 +279,7 @@ class TestLoginView(TestCase):
         response = self.client.get(reverse('home'), follow=True)
         self.assertTrue('form' in response.context)
 
+
 class TestConfirmationView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -291,6 +295,7 @@ class TestConfirmationView(TestCase):
         self.assertTemplateUsed(response, 'subscribers/confirmation.html')
         self.assertTemplateUsed(response, 'base.html')
 
+
 class TestMailChimpListenerView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -302,9 +307,8 @@ class TestMailChimpListenerView(TestCase):
         self.assertEqual(response.status_code, 400)
 
 
-
-#Remember to apply DRy and create a class that inherits from TestCase with 
-#RequestFactory within factory attr and make all view testcases inherit from it
+# Remember to apply DRy and create a class that inherits from TestCase with 
+# RequestFactory within factory attr and make all view testcases inherit from it
 class TestCreatePassword(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -325,7 +329,7 @@ class TestCreatePassword(TestCase):
         self.assertTrue('form' in response.context)
 
 
-#MODELS TESTS
+# MODELS TESTS
 class TestSubscribersModels(TestCase):
     def test_some_subscriber_fields(self):
         subscriber = Subscriber.objects.create(email='alex@test.com')
@@ -339,7 +343,6 @@ class TestSubscribersModels(TestCase):
         self.assertEqual(subscriber.confirmed_subscription, False)
         self.assertEqual(subscriber.referred, False)
         self.assertEqual(subscriber.referral_count, 0)
-
 
     def test_subscriber_model_in_db(self):
         subscriber_created = Subscriber.objects.create(
