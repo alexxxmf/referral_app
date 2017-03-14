@@ -310,6 +310,11 @@ class TestConfirmationView(TestCase):
         self.assertTemplateUsed(response, 'base.html')
 
 
+class TestDashboardView(TestCase):
+    def test(self):
+        pass
+
+
 class TestMailChimpListenerView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -325,7 +330,7 @@ class TestMailChimpListenerView(TestCase):
         referrer_start_status = Subscriber.objects.create(
             email='a@hot.com'
         )
-        subscriber = Subscriber.objects.create(
+        Subscriber.objects.create(
             email='b@hot.com',
             referred=True,
             email_from_referrer='a@hot.com'
@@ -345,9 +350,6 @@ class TestMailChimpListenerView(TestCase):
         self.assertTrue(subscriber_after_confirmation.confirmed_subscription)
         self.assertEqual(starting_count, 0)
         self.assertEqual(referrer_end_status.referral_count, 1)
-
-    def test_confirmed_subscription_updates_to_true(self):
-        pass
 
 
 # Remember to apply DRy and create a class that inherits from TestCase
@@ -374,7 +376,7 @@ class TestCreatePassword(TestCase):
 
 
 # MODELS TESTS
-class TestSubscribersModels(TestCase):
+class TestSubscribersModel(TestCase):
     def test_some_subscriber_fields(self):
         subscriber = Subscriber.objects.create(email='alex@test.com')
         self.assertEqual(subscriber.email, 'alex@test.com')
@@ -411,3 +413,4 @@ class TestSubscribersModels(TestCase):
         Subscriber.objects.create(email='alex@test.com')
         with self.assertRaises(IntegrityError):
             Subscriber.objects.create(email='alex@test.com')
+
