@@ -12,7 +12,7 @@ from subscribers.forms import (
     PasswordCreationForm,
     SubscriptionForm
 )
-from subscribers.models import Subscriber
+from subscribers.models import Reward, Subscriber
 from subscribers.views import (
     ConfirmationView,
     HomeView,
@@ -414,3 +414,17 @@ class TestSubscribersModel(TestCase):
         with self.assertRaises(IntegrityError):
             Subscriber.objects.create(email='alex@test.com')
 
+
+class TestRewardsModel(TestCase):
+
+    def test_reward_str(self):
+        reward = Reward.objects.create(
+            title='Sample 1',
+            description='This is just a test',
+            image='url-to-image',
+            required_referrals=3,
+            live=True
+
+        )
+
+        self.assertEqual(str(reward), reward.title)
