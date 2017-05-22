@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+
+
+{% block head %}
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<h1> Dashboard </h1>
+
+{{ ref_code }}
+
+{% if not has_referred_somebody %}
+
+	<p>
+		You haven't referred anyone yet. Go share this email and get
+		great rewards.
+	</p>
+
+{% endif %}
+
+
+
+<ul id="list-of-referred-users">
+	<p>Until now you got {{subscriber.referral_count}}</p>
+
+	{% for user_referred in referred_people %}
+
+	<li class='referred-subscriber'>
+
+		{{ user_referred.email }}
+
+	</li>
+	
+	{% endfor %}
+</ul>
+
+{% endblock %}
