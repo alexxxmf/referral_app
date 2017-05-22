@@ -113,6 +113,26 @@ class TestHomeBehavior(TestCase):
 
         #self.assertEqual(response_post.url, reverse('login'))
 
+    def test_confirmed_subscriber_properly_redirected_to_dashboard(self):
+        subscriber = Subscriber.objects.create(
+            email='z@hot.com',
+            confirmed_subscription=True
+        )
+
+        response_post = self.client.post(
+            reverse('home'),
+            {'email': subscriber.email},
+            HTTP_REMOTE_ADDR='127.0.0.1'
+        )
+
+        self.assertEqual(
+            response_post.url,
+            reverse(
+                'dashboard',
+                kwargs={'ref_code': subscriber.unique_code}
+            )
+        )
+
     def test_list_of_users_referred_properly_shown(self):
         subscriber = Subscriber.objects.create(
             email='z@hot.com',

@@ -94,7 +94,12 @@ class HomeView(TemplateView):
                 return redirect(reverse('confirmation_prompt'))
 
             else:
-                return redirect(reverse('login'))
+                return redirect(
+                    reverse(
+                        'dashboard',
+                        kwargs={'ref_code': subscriber.unique_code}
+                    )
+                )
 
         context = {
             'form': form,
