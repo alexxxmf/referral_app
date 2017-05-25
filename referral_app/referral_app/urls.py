@@ -1,5 +1,8 @@
+from django.conf import settings
 from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.static import serve
 
 from subscribers.views import (
     ConfirmationView,
@@ -10,7 +13,7 @@ from subscribers.views import (
 
 # mailchimp_listener
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin', admin.site.urls),
     # subscribers app
     url(
         r'^mc-listener$',
@@ -32,12 +35,26 @@ urlpatterns = [
         HomeView.as_view(),
         name='home'
     ),
-    url(
-        r'^(?P<ref_code>\S+)$',
-        HomeView.as_view(),
-        name='home_when_referred'
-    ),
+    #url(
+        #r'^(?P<ref_code>\S+)$',
+        #HomeView.as_view(),
+        #name='home_when_referred'
+    #),
 ]
 
+if settings.DEBUG is True:
+    urlpatterns += [
+        url(
+            r'^media/(?P<path>.*)$',
+            serve,
+            {'document_root': settings.MEDIA_ROOT}
+        ),
+
+        url(
+            r'^static/(?P<path>.*)$',
+            serve,
+            {'document_root': settings.STATIC_ROOT}
+        )
+    ]
 
 # why if i change the order of this list all gets messy in tests???
