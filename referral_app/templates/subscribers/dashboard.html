@@ -28,6 +28,20 @@
 
 {% endif %}
 
+<ul id="list-of-rewards">
+
+	{% for reward in rewards %}
+	<li class='referred-subscriber'>
+
+		{{ reward.title }}
+		<br>
+		<img src="{{ reward.image.url }}" width="200px">
+
+	</li>
+	
+	{% endfor %}
+</ul>
+
 
 
 <ul id="list-of-referred-users">

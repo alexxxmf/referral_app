@@ -16,6 +16,7 @@ from referral_app.settings import (
     SUBSCRIBERS_LIST_ID
 )
 
+from rewards.models import Reward
 from subscribers.forms import LoginForm, PasswordCreationForm, SubscriptionForm
 from subscribers.models import Subscriber
 
@@ -174,7 +175,11 @@ class DashboardView(CsrfExemptMixin, TemplateView):
     def get(self, request, ref_code):
         subscriber = Subscriber.objects.filter(unique_code=ref_code).first()
 
-        if subscriber:
+        if subscriber.confirmed_subscription is False:
+
+            return redirect(reverse('confirmation_prompt'))
+
+        elif subscriber.confirmed_subscription:
             has_referred_somebody = False
             referred_people = Subscriber.objects.filter(
                 email_from_referrer=subscriber.email,
@@ -183,11 +188,14 @@ class DashboardView(CsrfExemptMixin, TemplateView):
             if len(referred_people) >= 1:
                 has_referred_somebody = True
 
+            rewards = Reward.objects.filter(live=True).all()
+
             context = {
                 'ref_code': ref_code,
                 'subscriber': subscriber,
                 'referred_people': referred_people,
                 'has_referred_somebody': has_referred_somebody,
+                'rewards': rewards,
             }
 
             return render(
