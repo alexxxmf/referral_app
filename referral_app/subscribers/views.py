@@ -17,8 +17,9 @@ from referral_app.settings import (
 )
 
 from rewards.models import Reward
-from subscribers.forms import LoginForm, PasswordCreationForm, SubscriptionForm
+from subscribers.forms import SubscriptionForm
 from subscribers.models import Subscriber
+from subscribers.utils import relative_progress
 
 
 class HomeView(TemplateView):
@@ -190,12 +191,15 @@ class DashboardView(CsrfExemptMixin, TemplateView):
 
             rewards = Reward.objects.filter(live=True).all()
 
+            progress_bar_width = relative_progress(subscriber, rewards)
+
             context = {
                 'ref_code': ref_code,
                 'subscriber': subscriber,
                 'referred_people': referred_people,
                 'has_referred_somebody': has_referred_somebody,
                 'rewards': rewards,
+                'width': progress_bar_width
             }
 
             return render(
