@@ -8,6 +8,17 @@ from subscribers.models import Subscriber
 
 class TestRelativeProgress(TestCase):
     def test_relative_progress(self):
+
+        subscriber_1 = Subscriber.objects.create(
+            email='bb@hot.com',
+            confirmed_subscription=True,
+            referral_count=2,
+        )
+        rewards = Reward.objects.filter(live=True).all()
+
+        width = relative_progress(subscriber_1, rewards)
+        self.assertEqual(width, 0)
+
         Reward.objects.create(
             title='Reward 1',
             description='Random description',
@@ -53,30 +64,31 @@ class TestRelativeProgress(TestCase):
             live=True
         )
 
-        subscriber_1 = Subscriber.objects.create(
+        subscriber_2 = Subscriber.objects.create(
             email='z@hot.com',
             confirmed_subscription=True,
             referral_count=6,
         )
 
-        subscriber_2 = Subscriber.objects.create(
+        subscriber_3 = Subscriber.objects.create(
             email='a@hot.com',
             confirmed_subscription=True,
             referral_count=0,
         )
 
-        subscriber_3 = Subscriber.objects.create(
+        subscriber_4 = Subscriber.objects.create(
             email='b@hot.com',
             confirmed_subscription=True,
             referral_count=15,
         )
 
         rewards = Reward.objects.filter(live=True).all()
-        width = relative_progress(subscriber_1, rewards)
-        self.assertEqual(width, 45)
 
         width = relative_progress(subscriber_2, rewards)
-        self.assertEqual(width, 25)
+        self.assertEqual(width, 45)
 
         width = relative_progress(subscriber_3, rewards)
+        self.assertEqual(width, 25)
+
+        width = relative_progress(subscriber_4, rewards)
         self.assertEqual(width, 100)
