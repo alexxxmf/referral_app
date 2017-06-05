@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}Home{% endblock %}
-
-
 
 {% block head %}
 
-
+<link rel="stylesheet" type="text/css" href="{% static 'css/subscribers/home.css' %}">
 
 {% endblock %}
 
@@ -14,20 +14,42 @@
 
 {% block content %}
 
-<form class="form-inline" method='post' action="{% url 'home' %}" role='form'>
+<div class="jumbotron" id='jumbo-main'>
+    <div class="container">
+    	<div class='row text-center'>
+
+    		
 
 
-  <div class='input-group'>
 
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit" />
+    	</div>
+        
+    </div>
+</div>
 
-  </div>
+<div class='container-fluid'>
+	<div class = 'row text-center' id='input-block'>
+		<div class='col-md-6 col-md-offset-3'>
+
+			<form class="form-inline" method='post' action="{% url 'home' %}" role='form'>
 
 
-</form>
+				<div class='input-group'>
 
+			    	{% csrf_token %}
+			    	{{ form }}
+			    	<span class='input-group-btn'>
+						<input class="form-control btn btn-info" type="submit" value="Submit"/>
+					</span>
+
+				</div>
+
+
+			</form>
+
+		</div>
+	</div>
+</div>
 
 
 {% endblock %}
