@@ -14,6 +14,8 @@
 
 {% block content %}
 
+
+
 <div class="jumbotron" id='jumbo-main'>
     <div class="container">
     	<div class='row text-center'>
@@ -31,13 +33,17 @@
 	<div class = 'row text-center' id='input-block'>
 		<div class='col-md-6 col-md-offset-3'>
 
+			<h4>BE THE FIRST TO KNOW</h4>
+			<br>
+
 			<form class="form-inline" method='post' action="{% url 'home' %}" role='form'>
 
 
 				<div class='input-group'>
 
 			    	{% csrf_token %}
-			    	{{ form }}
+			    	{{ form.email }}
+			    	
 			    	<span class='input-group-btn'>
 						<input class="form-control btn btn-info" type="submit" value="Submit"/>
 					</span>
