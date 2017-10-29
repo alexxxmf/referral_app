@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.decorators.cache import never_cache
 from django.views.static import serve
 
 from subscribers.views import (
@@ -43,16 +44,17 @@ urlpatterns = [
 ]
 
 if settings.DEBUG is True:
+    static_view = never_cache(serve)
     urlpatterns += [
         url(
             r'^media/(?P<path>.*)$',
-            serve,
+            static_view,
             {'document_root': settings.MEDIA_ROOT}
         ),
 
         url(
             r'^static/(?P<path>.*)$',
-            serve,
+            static_view,
             {'document_root': settings.STATIC_ROOT}
         )
     ]
