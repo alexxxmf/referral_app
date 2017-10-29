@@ -14,10 +14,41 @@
 
 {% block content %}
 
+<div class="jumbotron">
+    <div class="container">
+    	<div class='row text-center'>
 
-<h1> Dashboard </h1>
+    		<div class='col-md-4 col-md-offset-7'>
 
-{{ ref_code }}
+    			<p id='invite-claim'>Don't leave your friends behind</p>
+    			
+    			<h3 id='invite-title'>INVITE FRIENDS & EARN PRODUCT</h3>
+    			<br>
+    			<p id='expl-unique'>Share your unique link via Facebook, Twitter or whatever you prefer your copypasting it and earn goods for every friend who signs up.</p>
+    			<span id='link-box'>
+    				<a href="{% url 'home_when_referred' ref_code=ref_code %}">
+    					{{ request.get_host }}{% url 'home_when_referred' ref_code=ref_code %}
+    				</a>
+    			</span>
+    			<br>
+    			<br>
+
+    			<a href="javascript:fbShare('websiteurl', 'Fb Share', 'Facebook share popup', 'http://goo.gl/dS52U', 520, 350)" class='logo-social' id='fb-link' href="" >
+					<i class="fa fa-facebook-square fa-3x " aria-hidden="true"></i>
+				</a>
+
+				<a class='logo-social twpopup' id='tw-link' href="https://twitter.com/home?status=This%20is%20just%20a%20try">
+					<i class="fa fa-twitter-square fa-3x " aria-hidden="true"></i>
+				</a>
+
+    		</div>
+
+
+
+    	</div>
+        
+    </div>
+</div>
 
 {% if not has_referred_somebody %}
 
@@ -27,6 +58,11 @@
 	</p>
 
 {% endif %}
+
+
+
+<!--
+
 
 <ul id="list-of-rewards">
 
@@ -57,5 +93,5 @@
 	
 	{% endfor %}
 </ul>
-
+-->
 {% endblock %}

@@ -91,3 +91,51 @@ class TestRewards(TestCase):
             reward_1.title
             in list_from_html_content
         )
+
+    def test_rewards_restrictions_for_referrals_needed(self):
+        reward_1 = Reward.objects.create(
+            title='Reward 1',
+            description='Random description',
+            image=SimpleUploadedFile(
+                name='test_image1.jpg',
+                content=open(
+                    settings.BASE_DIR + '/rewards/tests/random_picture.jpg',
+                    'rb'
+                ).read(),
+                content_type='image/jpeg'
+            ),
+            referrals_needed=5,
+            live=True
+        )
+
+        with self.assertRaises(Exception):
+            Reward.objects.create(
+                title='Reward 2',
+                description='Random description',
+                image=SimpleUploadedFile(
+                    name='test_image2.jpg',
+                    content=open(
+                        settings.BASE_DIR + '/rewards/tests/random_picture.jpg',
+                        'rb'
+                    ).read(),
+                    content_type='image/jpeg'
+                ),
+                referrals_needed=5,
+                live=True
+            )
+
+        with self.assertRaises(Exception):
+            Reward.objects.create(
+                title='Reward 2',
+                description='Random description',
+                image=SimpleUploadedFile(
+                    name='test_image2.jpg',
+                    content=open(
+                        settings.BASE_DIR + '/rewards/tests/random_picture.jpg',
+                        'rb'
+                    ).read(),
+                    content_type='image/jpeg'
+                ),
+                referrals_needed=0,
+                live=True
+            )

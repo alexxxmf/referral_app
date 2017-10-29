@@ -36,11 +36,11 @@ urlpatterns = [
         HomeView.as_view(),
         name='home'
     ),
-    #url(
-        #r'^(?P<ref_code>\S+)$',
-        #HomeView.as_view(),
-        #name='home_when_referred'
-    #),
+    url(
+        r'^(?P<ref_code>\S+)$',
+        HomeView.as_view(),
+        name='home_when_referred'
+    ),
 ]
 
 if settings.DEBUG is True:
