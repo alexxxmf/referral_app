@@ -6,7 +6,6 @@ def relative_progress(subscriber, rewards=None, stage=1):
     for a given subscriber and given set of rewards to then represent in
     graphically via Javascript in the template
     '''
-
     if len(rewards) == 0:
         return 0
     else:

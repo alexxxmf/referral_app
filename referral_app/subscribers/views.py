@@ -10,6 +10,8 @@ from django.views.generic import TemplateView
 
 
 from mailchimp3 import MailChimp
+import sys
+from unittest.mock import Mock
 
 from referral_app.settings import (
     MAILCHIMP_API_KEY,
@@ -52,7 +54,16 @@ class HomeView(TemplateView):
         """
         Function to manage email submitted via POST from email input form
         """
-        mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
+
+        TESTING_MODE = 'test' in sys.argv
+        if TESTING_MODE is False and settings.DEBUG:
+            # TODO: Check if this is the right way to do of there's something more pretty
+            # This way we don't depend on MailChimp when testing locally
+            mc_client = Mock()
+            print('DEBUGGING LOCALLY')
+        else:
+            mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
+
         form = SubscriptionForm(request.POST)
         # if valid ref code means it's referred by someone
         if form.is_valid():
@@ -83,7 +94,13 @@ class HomeView(TemplateView):
             subscriber = Subscriber.objects.filter(email=email).first()
             # should I add here a context depending if the user is created or
             # not but w/o confirmation
+
+            if settings.DEBUG is True:
+                created = False
+                subscriber.confirmed_subscription = True
+
             if created:
+                print('11111111111111')
                 mc_client.member.create(
                     SUBSCRIBERS_LIST_ID, {
                         'email_address': email,
@@ -176,6 +193,9 @@ class DashboardView(CsrfExemptMixin, TemplateView):
     """
     def get(self, request, ref_code):
         subscriber = Subscriber.objects.filter(unique_code=ref_code).first()
+        
+        if settings.DEBUG is True:
+            subscriber.confirmed_subscription = True
 
         if subscriber.confirmed_subscription is False:
 

@@ -8,8 +8,11 @@ class Reward(models.Model):
     title = models.CharField(max_length=40)
     description = models.CharField(max_length=255)
     image = models.ImageField()
-    referrals_needed = models.IntegerField(default=0)
+    referrals_needed = models.IntegerField(default=1)
     live = models.BooleanField(default=True)
+
+    # TODO: Prevent the user from adding more than one reward
+    # with the same number of referrals needed.
 
     def __str__(self):
         return self.title
