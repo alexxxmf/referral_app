@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}Home{% endblock %}
 
@@ -31,21 +32,21 @@
 	</div>
 
 	<div class = 'row text-center' id='input-block'>
-		<div class='col-md-6 col-md-offset-3'>
+		<div class='col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-10 col-xs-offset-1'>
 
 			<h4>BE THE FIRST TO KNOW</h4>
 			<br>
 
-			<form class="form-inline" method='post' action="{% url 'home' %}" role='form'>
+			<form class='form-inline signup-form' method='post' action="{% url 'home' %}" role='form'>
 
 
-				<div class='input-group'>
+				<div class='input-group signup-form-group'>
 
 			    	{% csrf_token %}
-			    	{{ form.email }}
+			    	{% render_field form.email class+='signup-form-group-email' %}
 			    	
-			    	<span class='input-group-btn'>
-						<input class="form-control btn btn-info" type="submit" value="Submit"/>
+			    	<span class='input-group-btn signup-form-group-email-wrapper'>
+						<input class='form-control btn btn-info signup-form-group-submit' type='submit' value='Submit'/>
 					</span>
 
 				</div>

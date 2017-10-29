@@ -2,6 +2,7 @@ beautifulsoup4
 click
 coverage
 Django
+django-widget-tweaks
 first
 flake8
 mailchimp3
