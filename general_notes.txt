@@ -1,0 +1,13 @@
+
+NOTES ON BUILD
+
+We have to force to create a venv executing just this command
+
+Just regular venv, no wrapper at all. At first glance, this looks easier
+with the aim to standarize the process, at least control it better.
+
+
+csrf exemption for mc-listener
+http://stackoverflow.com/questions/27315592/csrf-exempt-does-not-work-on-generic-view-based-class
+
+{'data[email_type]': 'html', 'data[ip_opt]': '92.3.165.147', 'data[id]': '2036c0cb2e', 'data[web_id]': '180713469', 'fired_at': '2017-03-11 16:12:14', 'data[merges][EMAIL]': 'aa@hua.com', 'data[merges][LNAME]': '', 'data[email]': 'aa@hua.com', 'data[merges][FNAME]': '', 'data[list_id]': 'bee5dd86d9', 'type': 'subscribe'}
