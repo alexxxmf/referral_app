@@ -20,6 +20,14 @@ class Reward(models.Model):
     def __repr__(self):
         return '<Reward: %s>' % (self.title)
 
+    def save(self, *args, **kwargs):
+        if self.referrals_needed == 0:
+            raise Exception('Referrals needed should be greater than 0')
+        reward = Reward.objects.filter(referrals_needed=self.referrals_needed).first()
+        if reward:
+            raise Exception('There is already a reward with the specified number of referrals needed')
+        super(Reward, self).save(*args, **kwargs)
+
     def image_src(self):
         # ImageField inherits from FileField
         if self.image:
