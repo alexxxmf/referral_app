@@ -1,16 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Home{% endblock %}
 
-
+{% load mathfilters %}
+{% load static %}
 
 {% block head %}
 
-
+<link rel="stylesheet" type="text/css" href="{% static 'css/subscribers/dashboard.css' %}">
 
 {% endblock %}
-
-
 
 {% block content %}
 
@@ -50,14 +49,62 @@
     </div>
 </div>
 
-{% if not has_referred_somebody %}
+<div class="row">
+	<div class="col-lg-8 col-lg-offset-2">
 
-	<p>
-		You haven't referred anyone yet. Go share this email and get
-		great rewards.
-	</p>
+		{% if not has_referred_somebody %}
+		<div class="referred-check">
+			<p class="text-center">
+				You haven't referred anyone yet. Come on, share your unique link and get these awesome rewards!
+			</p>
+		</div>
+		{% endif %}
 
-{% endif %}
+		
+		<div class="progress-wrapper">
+		{% with rewards_length=rewards|length %}
+			<div class="progress-top-data">
+				
+
+				
+
+				<span class="progress-heading correct-right-spacing">FRIENDS JOINED</span>
+				{% for reward in rewards %}
+				<!-- 80 comes from 100 - 20% width for the heading -->
+				<div class="progress-number-joined text-center correct-right-spacing correct-left-spacing" style="width:{{80|div:rewards_length}}%">
+					<a href="#">{{ reward.referrals_needed }}</a>
+				</div>
+				{% endfor %}
+
+
+
+			</div>
+
+			<div class="progress">
+
+				<div class="progress-bar" role="progressbar" aria-valuenow="70"
+				aria-valuemin="0" aria-valuemax="100" style="width:{{ width }}%">
+					<span class="sr-only">{{ width }}% Complete</span>
+				</div>
+
+			</div>
+
+			<div class="progress-bottom-data">
+				<span class="progress-heading">REWARDS</span>
+				{% for reward in rewards %}
+				<div class="progress-rewards text-center correct-right-spacing correct-left-spacing" style="width:{{80|div:rewards_length}}%">
+					<span>{{ reward.title }}</span>
+				</div>
+				{% endfor %}
+
+			</div>
+
+		{% endwith %}
+		</div>
+
+	</div>
+
+</div>
 
 
 

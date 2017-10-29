@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'subscribers',
     'rewards',
     'widget_tweaks',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
