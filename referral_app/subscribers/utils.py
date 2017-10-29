@@ -16,9 +16,9 @@ def relative_progress(subscriber, rewards=None, stage=1):
                 stage += 1
                 continue
             else:
-                width = 25 + (
+                width = 20 + (
                     (subscriber.referral_count / reward_ref_count) * (
-                        (stage * (100 - 25) / len(rewards))
+                        (stage * (100 - 20) / len(rewards))
                     )
                 )
                 width = int(width)
