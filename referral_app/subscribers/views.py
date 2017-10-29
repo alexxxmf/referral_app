@@ -1,5 +1,6 @@
 from braces.views import CsrfExemptMixin
 
+from django.conf import settings
 from django.db.models import F
 from django.http import HttpResponse
 # HttpResponseBadRequest
