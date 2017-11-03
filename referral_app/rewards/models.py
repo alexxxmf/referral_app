@@ -31,7 +31,7 @@ class Reward(models.Model):
     def image_src(self):
         # ImageField inherits from FileField
         if self.image:
-            return '<img src="%s" />' % self.image.url
+            return 'src=%s' % self.image.url
         else:
             return '(No image)'
 

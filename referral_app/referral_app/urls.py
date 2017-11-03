@@ -35,12 +35,7 @@ urlpatterns = [
         r'^$',
         HomeView.as_view(),
         name='home'
-    ),
-    url(
-        r'^(?P<ref_code>\S+)$',
-        HomeView.as_view(),
-        name='home_when_referred'
-    ),
+    )
 ]
 
 if settings.DEBUG is True:
@@ -59,4 +54,8 @@ if settings.DEBUG is True:
         )
     ]
 
-# why if i change the order of this list all gets messy in tests???
+# TODO: find out how to set the regex to be able to put this bit in the original part
+urlpatterns += [url(r'^(?P<ref_code>\S+)$', HomeView.as_view(), name='home_when_referred')]
+
+
+
