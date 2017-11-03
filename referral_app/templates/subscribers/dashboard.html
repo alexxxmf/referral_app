@@ -98,8 +98,14 @@
 				<span class="progress-heading">REWARDS</span>
 				{% for reward in rewards %}
 				<div class="progress-rewards text-center correct-right-spacing correct-left-spacing" style="width:{{80|div:rewards_length}}%">
-					<span>{{ reward.title }}</span>
+					<span class="reward-title">{{ reward.title }}</span>
+					<div class="reward-popup">
+						<img class="reward-popup-image" src="{{ reward.image_src }}">
+						aaaaaa
+					</div>
 				</div>
+
+
 				{% endfor %}
 
 			</div>
