@@ -2,11 +2,11 @@
 
 {% block title %}Confirmation{% endblock %}
 
-
+{% load static %}
 
 {% block head %}
 
-
+<link rel="stylesheet" type="text/css" href="{% static 'css/subscribers/confirmation.css' %}">
 
 {% endblock %}
 
@@ -14,9 +14,16 @@
 
 {% block content %}
 
+<div class="row text-center confirmation-wrapper">
+	<div class="col-lg-6 col-lg-offset-3">
+		<h1 id="main_confirmation_prompt"> Thanks for your support! </h1>
 
-<h1 id="main_confirmation_prompt"> Confirmation </h1>
-
+		<p class="explanation">
+			Please, don't forget to confirm your subscription to be able to win our amazing rewards.
+			You just need to check your inbox, find the email we've just sent you and click confirm.
+		</p>
+	</div>
+</div>
 
 
 {% endblock %}
