@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-
+from ipware.ip import get_ip
 from mailchimp3 import MailChimp
 import sys
 from unittest.mock import Mock
@@ -55,6 +55,7 @@ class HomeView(TemplateView):
         Function to manage email submitted via POST from email input form
         """
 
+
         TESTING_MODE = 'test' in sys.argv
         if TESTING_MODE is False and settings.DEBUG:
             # TODO: Check if this is the right way to do of there's something more pretty
@@ -68,7 +69,7 @@ class HomeView(TemplateView):
         # if valid ref code means it's referred by someone
         if form.is_valid():
             email = form.cleaned_data['email']
-            ip_from_user = request.META.get('REMOTE_ADDR', '0')
+            ip_from_user = get_ip(request)
 
             if request.session.get('ref_code', False):
                 email_from_referrer = Subscriber.objects.filter(
