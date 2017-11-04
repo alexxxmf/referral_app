@@ -37,3 +37,11 @@ def url_shortener(url):
     shortener = Shortener('Tinyurl')
     shortened_url = shortener.short(url)
     return shortened_url
+
+
+class TooManySubscriptionsFromSameIP(Exception):
+    '''
+    This is the exception we are going to raise once we pass the number of email
+    subscriptions from the same IP. Just in case somebody tries to gamble the system
+    '''
+    pass

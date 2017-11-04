@@ -22,7 +22,7 @@ from referral_app.settings import (
 from rewards.models import Reward
 from subscribers.forms import SubscriptionForm
 from subscribers.models import Subscriber
-from subscribers.utils import relative_progress
+from subscribers.utils import relative_progress, TooManySubscriptionsFromSameIP
 
 
 class HomeView(TemplateView):
@@ -49,13 +49,12 @@ class HomeView(TemplateView):
             context
         )
 
-    # Check if it is compulsory to set a default for ref_code as in Flask
     def post(self, request, ref_code=None):
         """
         Function to manage email submitted via POST from email input form
         """
 
-
+        # TODO: Refactor this bits mentioning DEBUG mode
         TESTING_MODE = 'test' in sys.argv
         if TESTING_MODE is False and settings.DEBUG:
             # TODO: Check if this is the right way to do of there's something more pretty
@@ -66,7 +65,7 @@ class HomeView(TemplateView):
             mc_client = MailChimp(MAILCHIMP_USERNAME, MAILCHIMP_API_KEY)
 
         form = SubscriptionForm(request.POST)
-        # if valid ref code means it's referred by someone
+
         if form.is_valid():
             email = form.cleaned_data['email']
             ip_from_user = get_ip(request)
@@ -91,17 +90,12 @@ class HomeView(TemplateView):
                     'referred': referred,
                 },
             )
-            # better to force confirmation to update referral count
-            subscriber = Subscriber.objects.filter(email=email).first()
-            # should I add here a context depending if the user is created or
-            # not but w/o confirmation
 
             if settings.DEBUG is True:
                 created = False
                 subscriber.confirmed_subscription = True
 
             if created:
-                print('11111111111111')
                 mc_client.member.create(
                     SUBSCRIBERS_LIST_ID, {
                         'email_address': email,

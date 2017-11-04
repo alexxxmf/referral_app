@@ -1,5 +1,8 @@
 import uuid
 
+from subscribers.utils import TooManySubscriptionsFromSameIP
+
+from django.conf import settings
 from django.db import models
 
 
@@ -22,6 +25,10 @@ class Subscriber(models.Model):
     def save(self, *args, **kwargs):
         self.unique_code = uuid.uuid4().hex
         self.password = self.unique_code[0:9]
+        subscribers_with_same_ip = Subscriber.objects.filter(ip=self.ip)
+        # TODO: Is this a proper way to accomplish the task?
+        if len(subscribers_with_same_ip) > settings.LIMIT_SUBSCRIBERS_FROM_SAME_IP:
+            raise TooManySubscriptionsFromSameIP
 
         super().save(*args, **kwargs)
 
