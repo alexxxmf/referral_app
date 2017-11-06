@@ -1,11 +1,13 @@
-from django.test import RequestFactory, TestCase
 from django.db.utils import IntegrityError
+from django.test import TestCase
 
-
-from subscribers.models import Reward, Subscriber
+from subscribers.models import Subscriber
 
 
 class TestSubscribersModel(TestCase):
+    """
+    Test suite for the subscriber model
+    """
     def test_some_subscriber_fields(self):
         subscriber = Subscriber.objects.create(email='alex@test.com')
         self.assertEqual(subscriber.email, 'alex@test.com')
@@ -42,18 +44,3 @@ class TestSubscribersModel(TestCase):
         Subscriber.objects.create(email='alex@test.com')
         with self.assertRaises(IntegrityError):
             Subscriber.objects.create(email='alex@test.com')
-
-
-class TestRewardsModel(TestCase):
-
-    def test_reward_str(self):
-        reward = Reward.objects.create(
-            title='Sample 1',
-            description='This is just a test',
-            image='url-to-image',
-            required_referrals=3,
-            live=True
-
-        )
-
-        self.assertEqual(str(reward), reward.title)

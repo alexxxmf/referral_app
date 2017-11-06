@@ -1,4 +1,4 @@
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 
 
 from subscribers.forms import (

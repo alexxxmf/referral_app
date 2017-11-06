@@ -15,7 +15,9 @@ image_path = tempfile.NamedTemporaryFile(suffix=".jpg").name
 
 
 class TestRewards(TestCase):
-
+    """
+    Integration tests for rewards app
+    """
     def test_just_live_rewards_are_shown_in_dashboard(self):
         reward_1 = Reward.objects.create(
             title='Reward 1',
@@ -32,7 +34,7 @@ class TestRewards(TestCase):
             live=True
         )
 
-        reward_2 = Reward.objects.create(
+        Reward.objects.create(
             title='Reward 2',
             description='Random description',
             image=SimpleUploadedFile(
@@ -47,7 +49,7 @@ class TestRewards(TestCase):
             live=True
         )
 
-        reward_3 = Reward.objects.create(
+        Reward.objects.create(
             title='Reward 3',
             description='Random description',
             image=SimpleUploadedFile(
@@ -77,9 +79,9 @@ class TestRewards(TestCase):
 
         soup = BeautifulSoup(response_get.content, "html.parser")
         html_content = soup.find_all(
-            "li",
+            "span",
             attrs={
-                "class": "reward",
+                "class": "reward-title",
             }
         )
 
@@ -93,7 +95,7 @@ class TestRewards(TestCase):
         )
 
     def test_rewards_restrictions_for_referrals_needed(self):
-        reward_1 = Reward.objects.create(
+        Reward.objects.create(
             title='Reward 1',
             description='Random description',
             image=SimpleUploadedFile(
@@ -115,7 +117,8 @@ class TestRewards(TestCase):
                 image=SimpleUploadedFile(
                     name='test_image2.jpg',
                     content=open(
-                        settings.BASE_DIR + '/rewards/tests/random_picture.jpg',
+                        settings.BASE_DIR +
+                        '/rewards/tests/random_picture.jpg',
                         'rb'
                     ).read(),
                     content_type='image/jpeg'
@@ -131,7 +134,8 @@ class TestRewards(TestCase):
                 image=SimpleUploadedFile(
                     name='test_image2.jpg',
                     content=open(
-                        settings.BASE_DIR + '/rewards/tests/random_picture.jpg',
+                        settings.BASE_DIR +
+                        '/rewards/tests/random_picture.jpg',
                         'rb'
                     ).read(),
                     content_type='image/jpeg'

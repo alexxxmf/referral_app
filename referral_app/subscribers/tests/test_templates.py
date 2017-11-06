@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup
 
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 
 class TestHomeTemplate(TestCase):
-
+    """
+    Test suite for the homepage templates
+    """
     def test_home_template_title(self):
         response = self.client.get(reverse('home'), follow=True)
         self.assertNotEqual(response.content.find(b'<title>Home</title>'), -1)
@@ -40,7 +42,9 @@ class TestHomeTemplate(TestCase):
 
 
 class TestConfirmationTemplate(TestCase):
-
+    """
+    Test suite for the confirmation templates
+    """
     def test_confirmation_template_content_rendered_properly(self):
         response = self.client.get(reverse('confirmation_prompt'), follow=True)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -51,4 +55,3 @@ class TestConfirmationTemplate(TestCase):
             }
         )
         self.assertNotEqual(main_prompt, None)
-

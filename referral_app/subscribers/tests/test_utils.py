@@ -6,7 +6,11 @@ from rewards.models import Reward
 from subscribers.utils import relative_progress
 from subscribers.models import Subscriber
 
+
 class TestRelativeProgress(TestCase):
+    """
+    Test suite to test the relatice progress utils
+    """
     def test_relative_progress(self):
 
         subscriber_1 = Subscriber.objects.create(
@@ -85,10 +89,10 @@ class TestRelativeProgress(TestCase):
         rewards = Reward.objects.filter(live=True).all()
 
         width = relative_progress(subscriber_2, rewards)
-        self.assertEqual(width, 45)
+        self.assertEqual(width, 41)
 
         width = relative_progress(subscriber_3, rewards)
-        self.assertEqual(width, 25)
+        self.assertEqual(width, 20)
 
         width = relative_progress(subscriber_4, rewards)
         self.assertEqual(width, 100)

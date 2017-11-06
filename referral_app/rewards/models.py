@@ -1,8 +1,10 @@
-from django.conf import settings
 from django.db import models
 
 
 class Reward(models.Model):
+    """
+    Model for the rewards
+    """
     db_table = 'rewards'
 
     title = models.CharField(max_length=40)
@@ -23,9 +25,14 @@ class Reward(models.Model):
     def save(self, *args, **kwargs):
         if self.referrals_needed == 0:
             raise Exception('Referrals needed should be greater than 0')
-        reward = Reward.objects.filter(referrals_needed=self.referrals_needed).first()
+        reward = Reward.objects.filter(
+            referrals_needed=self.referrals_needed
+        ).first()
         if reward:
-            raise Exception('There is already a reward with the specified number of referrals needed')
+            raise Exception(
+                'There is already a reward with the specified '
+                'number of referrals needed'
+            )
         super(Reward, self).save(*args, **kwargs)
 
     def image_src(self):

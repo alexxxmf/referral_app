@@ -3,24 +3,16 @@ from unittest.mock import Mock, patch
 from bs4 import BeautifulSoup
 
 from django.contrib.sessions.models import Session
-from django.db.utils import IntegrityError
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
-from subscribers.forms import (
-    LoginForm,
-    PasswordCreationForm,
-    SubscriptionForm
-)
-from subscribers.models import Reward, Subscriber
-from subscribers.views import (
-    ConfirmationView,
-    HomeView,
-    MailChimpListenerView
-)
+from subscribers.models import Subscriber
 
 
 class TestSubscribers(TestCase):
+    """
+    Integration test
+    """
 
     def test_session_created_just_when_ref_code_provided(self):
         response = self.client.get(reverse('home'))
@@ -87,8 +79,8 @@ class TestSubscribers(TestCase):
         self.assertEqual(subscriber_2.email_from_referrer, 'abel@hot.com')
         self.assertEqual(response_post.url, reverse('confirmation_prompt'))
 
-    # in tests not working but working properly when running server
-    # wtf is happening??!!!
+    #in tests not working but working properly when running server
+    #wtf is happening??!!!
     #def test_subscriber_already_in_db_without_confirmation(self):
         #Subscriber.objects.create(email='a@hot.com')
 
@@ -140,19 +132,14 @@ class TestSubscribers(TestCase):
             referral_count=2,
         )
 
-        referred_subscriber_1 = Subscriber.objects.create(
+        Subscriber.objects.create(
             email='referred1@hot.com',
             referred=True,
             email_from_referrer=subscriber.email,
             confirmed_subscription=True,
         )
-        referred_subscriber_2 = Subscriber.objects.create(
-            email='referred2@hot.com',
-            referred=True,
-            email_from_referrer=subscriber.email,
-            confirmed_subscription=True,
-        )
-        referred_subscriber_3 = Subscriber.objects.create(
+
+        Subscriber.objects.create(
             email='referred3@hot.com',
             referred=True,
             email_from_referrer=subscriber.email,
@@ -168,20 +155,13 @@ class TestSubscribers(TestCase):
 
         soup = BeautifulSoup(response_get.content, "html.parser")
         html_content = soup.find_all(
-            "li",
+            "span",
             attrs={
-                "class": "referred-subscriber",
+                "id": "friends-joined",
             }
         )
 
-        self.assertEqual(len(html_content), 2)
-        list_from_html_content = [e.text.strip() for e in html_content]
-
-        assert(
-            referred_subscriber_1.email and
-            referred_subscriber_2.email
-            in list_from_html_content
-        )
+        self.assertEqual(len(html_content), 1)
 
     def test_subscriber_redirected_if_is_not_confirmed_yet(self):
         subscriber = Subscriber.objects.create(

@@ -6,13 +6,13 @@ from .models import Subscriber
 class SubscriberAdmin(admin.ModelAdmin):
 
     list_display = (
-    	'email',
-    	'email_from_referrer',
-    	'confirmed_subscription',
-    	'ip',
-    	'referral_count',
-    	'referred',
-    	'unique_code',
+        'email',
+        'email_from_referrer',
+        'confirmed_subscription',
+        'ip',
+        'referral_count',
+        'referred',
+        'unique_code',
     )
 
 

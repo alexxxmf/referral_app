@@ -1,17 +1,7 @@
-from unittest.mock import Mock, patch
-
-from bs4 import BeautifulSoup
-
-from django.contrib.sessions.models import Session
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
-from subscribers.forms import (
-    LoginForm,
-    PasswordCreationForm,
-    SubscriptionForm
-)
-from subscribers.models import Reward, Subscriber
+from subscribers.models import Subscriber
 from subscribers.views import (
     ConfirmationView,
     HomeView,
@@ -21,7 +11,9 @@ from subscribers.views import (
 
 
 class TestHomeView(TestCase):
-
+    """
+    Test suite for the home page
+    """
     def setUp(self):
         self.factory = RequestFactory()
         self.home_view = HomeView()
@@ -48,7 +40,11 @@ class TestHomeView(TestCase):
         response = self.client.post(reverse('home'), follow=True)
         self.assertTrue('form' in response.context)
 
+
 class TestConfirmationView(TestCase):
+    """
+    Test suite for the confirmation page
+    """
     def setUp(self):
         self.factory = RequestFactory()
         self.confirmation_view = ConfirmationView()
@@ -65,6 +61,9 @@ class TestConfirmationView(TestCase):
 
 
 class TestDashboardView(TestCase):
+    """
+    Test suite for the dashboard page
+    """
     def setUp(self):
         self.factory = RequestFactory()
         self.dashboard_view = DashboardView()
@@ -74,6 +73,9 @@ class TestDashboardView(TestCase):
 
 
 class TestMailChimpListenerView(TestCase):
+    """
+    Test suite for the mailchimp page
+    """
     def setUp(self):
         self.factory = RequestFactory()
         self.mc_listener_view = MailChimpListenerView()

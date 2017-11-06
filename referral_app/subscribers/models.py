@@ -11,6 +11,9 @@ from django.db import models
 # the important value would be this REMOTE_ADDR. The current method is going
 # to give us the same ip all day long (server)
 class Subscriber(models.Model):
+    """
+    Model to manage subscribers
+    """
     db_table = 'subscribers'
 
     confirmed_subscription = models.BooleanField(default=False)
@@ -27,7 +30,8 @@ class Subscriber(models.Model):
         self.password = self.unique_code[0:9]
         subscribers_with_same_ip = Subscriber.objects.filter(ip=self.ip)
         # TODO: Is this a proper way to accomplish the task?
-        if len(subscribers_with_same_ip) > settings.LIMIT_SUBSCRIBERS_FROM_SAME_IP:
+        LIMIT = settings.LIMIT_SUBSCRIBERS_FROM_SAME_IP
+        if len(subscribers_with_same_ip) > LIMIT:
             raise TooManySubscriptionsFromSameIP
 
         super().save(*args, **kwargs)

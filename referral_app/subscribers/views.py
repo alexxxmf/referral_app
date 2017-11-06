@@ -1,3 +1,6 @@
+import sys
+from unittest.mock import Mock
+
 from braces.views import CsrfExemptMixin
 
 from django.conf import settings
@@ -8,10 +11,10 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
 
+
 from ipware.ip import get_ip
+
 from mailchimp3 import MailChimp
-import sys
-from unittest.mock import Mock
 
 from referral_app.settings import (
     MAILCHIMP_API_KEY,
@@ -20,9 +23,10 @@ from referral_app.settings import (
 )
 
 from rewards.models import Reward
+
 from subscribers.forms import SubscriptionForm
 from subscribers.models import Subscriber
-from subscribers.utils import relative_progress, TooManySubscriptionsFromSameIP
+from subscribers.utils import relative_progress
 
 
 class HomeView(TemplateView):
@@ -53,11 +57,11 @@ class HomeView(TemplateView):
         """
         Function to manage email submitted via POST from email input form
         """
-
         # TODO: Refactor this bits mentioning DEBUG mode
         TESTING_MODE = 'test' in sys.argv
         if TESTING_MODE is False and settings.DEBUG:
-            # TODO: Check if this is the right way to do of there's something more pretty
+            # TODO: Check if this is the right way to do if
+            # there's a prettier way
             # This way we don't depend on MailChimp when testing locally
             mc_client = Mock()
             print('DEBUGGING LOCALLY')
@@ -126,7 +130,6 @@ class HomeView(TemplateView):
         )
 
 
-
 class ConfirmationView(TemplateView):
     """
     CBV for the page to remind the user to confirm email sub.
@@ -187,9 +190,13 @@ class DashboardView(CsrfExemptMixin, TemplateView):
     CBV to present all the data to the user.
     """
     def get(self, request, ref_code):
+        """
+        Function to get the dashboard view
+        """
         subscriber = Subscriber.objects.filter(unique_code=ref_code).first()
-        
-        if settings.DEBUG is True:
+
+        TESTING_MODE = 'test' in sys.argv
+        if settings.DEBUG is True and TESTING_MODE is False:
             subscriber.confirmed_subscription = True
 
         if subscriber.confirmed_subscription is False:
